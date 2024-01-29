@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
 #define PHYLIB_BALL_RADIUS (28.5) // mm
 #define PHYLIB_BALL_DIAMETER (2*PHYLIB_BALL_RADIUS)
 #define PHYLIB_HOLE_RADIUS (2*PHYLIB_BALL_DIAMETER)
@@ -10,59 +15,61 @@
 #define PHYLIB_MAX_OBJECTS (26)
 
 
+//All required Structs
+
 typedef enum {
-    PHYLIB_STILL_BALL = 0,
-    PHYLIB_ROLLING_BALL = 1,
-    PHYLIB_HOLE = 2,
-    PHYLIB_HCUSHION = 3,
-    PHYLIB_VCUSHION = 4,
+PHYLIB_STILL_BALL = 0,
+PHYLIB_ROLLING_BALL = 1,
+PHYLIB_HOLE = 2,
+PHYLIB_HCUSHION = 3,
+PHYLIB_VCUSHION = 4,
 } phylib_obj;
 
 typedef struct {
-    double x;
-    double y;
+double x;
+double y;
 } phylib_coord;
 
 typedef struct {
-    unsigned char number;
-    phylib_coord pos;
+unsigned char number;
+phylib_coord pos;
 } phylib_still_ball;
 
 typedef struct {
-    unsigned char number;
-    phylib_coord pos;
-    phylib_coord vel;
-    phylib_coord acc;
+unsigned char number;
+phylib_coord pos;
+phylib_coord vel;
+phylib_coord acc;
 } phylib_rolling_ball;
 
 typedef struct {
-    phylib_coord pos;
+phylib_coord pos;
 } phylib_hole;
 
 typedef struct {
-    double y;
+double y;
 } phylib_hcushion;
 
 typedef struct {
-    double x;
-} phylib_vcushion;  
+double x;
+} phylib_vcushion;
 
 typedef union {
-    phylib_still_ball still_ball;
-    phylib_rolling_ball rolling_ball;
-    phylib_hole hole;
-    phylib_hcushion hcushion;
-    phylib_vcushion vcushion;
+phylib_still_ball still_ball;
+phylib_rolling_ball rolling_ball;
+phylib_hole hole;
+phylib_hcushion hcushion;
+phylib_vcushion vcushion;
 } phylib_untyped;
 
 typedef struct {
-    phylib_obj type;
-    phylib_untyped obj;
+phylib_obj type;
+phylib_untyped obj;
 } phylib_object;
 
 typedef struct {
-    double time;
-    phylib_object *object[PHYLIB_MAX_OBJECTS];
+double time;
+phylib_object *object[PHYLIB_MAX_OBJECTS];
 } phylib_table;
 
 phylib_object *phylib_new_still_ball( unsigned char number, phylib_coord *pos );
@@ -79,3 +86,16 @@ phylib_coord phylib_sub( phylib_coord c1, phylib_coord c2 );
 double phylib_length( phylib_coord c );
 double phylib_dot_product( phylib_coord a, phylib_coord b );
 double phylib_distance( phylib_object *obj1, phylib_object *obj2 );
+void phylib_roll( phylib_object *new, phylib_object *old, double time );
+unsigned char phylib_stopped( phylib_object *object );
+void phylib_bounce( phylib_object **a, phylib_object **b );
+unsigned char phylib_rolling( phylib_table *t );
+phylib_table *phylib_segment( phylib_table *table );
+// phylib.h
+
+//phylib_coord phylib_subtract(phylib_coord c1, phylib_coord c2);
+phylib_coord phylib_normalize(phylib_coord c);
+double phylib_vector_length(phylib_coord c);
+phylib_coord phylib_scalar_multiply(double scalar, phylib_coord c);
+//void phylib_roll(phylib_object *new, phylib_object *old, double time);
+void phylib_roll(phylib_object *new, phylib_object *old, double time);
