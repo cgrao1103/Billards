@@ -4,53 +4,6 @@
 #include <math.h>
 #include <string.h>
 
-int main() {
-    // Create two rolling balls for testing
-    phylib_object *rollingBallA = (phylib_object *)malloc(sizeof(phylib_object));
-    rollingBallA->type = PHYLIB_ROLLING_BALL;
-    rollingBallA->obj.rolling_ball.number = 1;
-    rollingBallA->obj.rolling_ball.pos.x = 10.0;
-    rollingBallA->obj.rolling_ball.pos.y = 20.0;
-    rollingBallA->obj.rolling_ball.vel.x = 2.0;
-    rollingBallA->obj.rolling_ball.vel.y = 1.0;
-    rollingBallA->obj.rolling_ball.acc.x = 0.0;
-    rollingBallA->obj.rolling_ball.acc.y = 0.0;
-
-    phylib_object *rollingBallB = (phylib_object *)malloc(sizeof(phylib_object));
-    rollingBallB->type = PHYLIB_STILL_BALL;
-    // rollingBallB->obj.rolling_ball.number = 2;
-    rollingBallB->obj.rolling_ball.pos.x = 15.0;
-    rollingBallB->obj.rolling_ball.pos.y = 25.0;
-    // rollingBallB->obj.rolling_ball.vel.x = -1.0;
-    // rollingBallB->obj.rolling_ball.vel.y = -2.0;
-    // rollingBallB->obj.rolling_ball.acc.x = 0.0;
-    // rollingBallB->obj.rolling_ball.acc.y = 0.0;
-
-    // Print initial velocities
-    printf("Initial Velocities:\n");
-    printf("Ball A: (%.2lf, %.2lf)\n", rollingBallA->obj.rolling_ball.vel.x, rollingBallA->obj.rolling_ball.vel.y);
-    printf("Ball B: (%.2lf, %.2lf)\n", rollingBallB->obj.rolling_ball.vel.x, rollingBallB->obj.rolling_ball.vel.y);
-
-    // Simulate a collision
-    phylib_bounce(&rollingBallA, &rollingBallB);
-
-    // Print velocities after collision
-    printf("\nVelocities After Collision:\n");
-    if(rollingBallA == NULL){
-      printf("IF WAS A HOLE");
-    }
-    else
-    printf("Ball A: (%.2lf, %.2lf)\n", rollingBallA->obj.rolling_ball.vel.x, rollingBallA->obj.rolling_ball.vel.y);
-    printf("Ball B: (%.2lf, %.2lf)\n", rollingBallB->obj.rolling_ball.vel.x, rollingBallB->obj.rolling_ball.vel.y);
-
-    // Clean up - free memory
-    free(rollingBallA);
-    free(rollingBallB);
-
-    return 0;
-}
-
-/*
 void phylib_print_object( phylib_object *object )
 {
   if (object==NULL)
@@ -156,5 +109,5 @@ int main( int argc, char **argv )
 
     phylib_print_table( table );
   } while( table );
-}*/
+}
 
