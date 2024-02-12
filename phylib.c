@@ -540,6 +540,7 @@ phylib_table *simulateTable(phylib_table *table)
         phylib_table *stoppedTable = checkBallStopped(resultTable);
         if (stoppedTable != NULL)
         {
+            free(resultTable);
             return stoppedTable; // Stopping condition 1: Ball has stopped
         }
 
@@ -550,6 +551,7 @@ phylib_table *simulateTable(phylib_table *table)
                 phylib_table *collisionTable = checkCollisionAndBounce(resultTable, i, j);
                 if (collisionTable != NULL)
                 {
+                    free(resultTable);
                     return collisionTable; // Stopping condition 2: Collision detected and bounce applied
                 }
             }
@@ -559,5 +561,6 @@ phylib_table *simulateTable(phylib_table *table)
         resultTable->time += PHYLIB_SIM_RATE; // Time update
     }
 
+    free(resultTable);
     return NULL; // Max time reached
 }

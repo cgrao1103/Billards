@@ -1,20 +1,31 @@
 # Makefile for C program with all warnings enabled
 
 # Compiler
-CC = clang
-CFLAGS = -std=c99 -Wall -pedantic
-LDFLAGS = -L. -lphylib -lm
+CC = gcc
 
-all: libphylib.so 
+# Compiler flags with all warnings
+CFLAGS = -Wall -std=c99 -g
 
-phylib.o: phylib.c phylib.h
-	$(CC) $(CFLAGS) -fpic -c $< -o $@
+# Source files
+SRCS = phylib.c A1test1.c
 
-libphylib.so: phylib.o
-	$(CC) -shared -o $@ $<
+# Header files
+HDRS = phylib.h
 
-A1test1: A1test1.c phylib.h libphylib.so
-	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
+# Object files
+OBJS = $(SRCS:.c=.o)
 
+# Executable name
+TARGET = A1test1
+
+# Rule to build the executable
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+# Rule to build object files
+%.o: %.c $(HDRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Clean rule
 clean:
-	rm -f *.o *.so
+	rm -f $(OBJS) $(TARGET)
