@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#define PHYLIB_H
 
 #define PHYLIB_BALL_RADIUS (28.5) // mm
 #define PHYLIB_BALL_DIAMETER (2*PHYLIB_BALL_RADIUS)
@@ -109,3 +108,5 @@ phylib_table *simulateTable(phylib_table *table);
 void handleCushionBounce(phylib_object *a, phylib_object *b);
 void handleRollingBallBounce(phylib_object *a, phylib_object *b);
 
+//A2
+char *phylib_object_string(phylib_object *object);

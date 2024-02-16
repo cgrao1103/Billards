@@ -540,7 +540,6 @@ phylib_table *simulateTable(phylib_table *table)
         phylib_table *stoppedTable = checkBallStopped(resultTable);
         if (stoppedTable != NULL)
         {
-            free(resultTable);
             return stoppedTable; // Stopping condition 1: Ball has stopped
         }
 
@@ -551,7 +550,6 @@ phylib_table *simulateTable(phylib_table *table)
                 phylib_table *collisionTable = checkCollisionAndBounce(resultTable, i, j);
                 if (collisionTable != NULL)
                 {
-                    free(resultTable);
                     return collisionTable; // Stopping condition 2: Collision detected and bounce applied
                 }
             }
@@ -561,6 +559,54 @@ phylib_table *simulateTable(phylib_table *table)
         resultTable->time += PHYLIB_SIM_RATE; // Time update
     }
 
-    free(resultTable);
     return NULL; // Max time reached
 }
+
+char *phylib_object_string(phylib_object *object)
+{
+    static char string[80];
+    if (object == NULL)
+    {
+        snprintf(string, 80, "NULL;");
+        return string;
+    }
+    switch (object->type)
+    {
+    case PHYLIB_STILL_BALL:
+        snprintf(string, 80,
+                 "STILL_BALL (%d,%6.1lf,%6.1lf)",
+                 object->obj.still_ball.number,
+                 object->obj.still_ball.pos.x,
+                 object->obj.still_ball.pos.y);
+        break;
+    case PHYLIB_ROLLING_BALL:
+        snprintf(string, 80,
+                 "ROLLING_BALL (%d,%6.1lf,%6.1lf,%6.1lf,%6.1lf,%6.1lf,%6.1lf)",
+                 object->obj.rolling_ball.number,
+                 object->obj.rolling_ball.pos.x,
+                 object->obj.rolling_ball.pos.y,
+                 object->obj.rolling_ball.vel.x,
+                 object->obj.rolling_ball.vel.y,
+                 object->obj.rolling_ball.acc.x,
+                 object->obj.rolling_ball.acc.y);
+        break;
+    case PHYLIB_HOLE:
+        snprintf(string, 80,
+                 "HOLE (%6.1lf,%6.1lf)",
+                 object->obj.hole.pos.x,
+                 object->obj.hole.pos.y);
+        break;
+    case PHYLIB_HCUSHION:
+        snprintf(string, 80,
+                 "HCUSHION (%6.1lf)",
+                 object->obj.hcushion.y);
+        break;
+    case PHYLIB_VCUSHION:
+        snprintf(string, 80,
+                 "VCUSHION (%6.1lf)",
+                 object->obj.vcushion.x);
+        break;
+    }
+    return string;
+}
+
