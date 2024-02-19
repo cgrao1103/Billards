@@ -1,10 +1,28 @@
 import phylib
 
+# Define the header and footer for SVG files
+HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="700" height="1375" viewBox="-25 -25 1400 2750"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="1350" height="2700" x="0" y="0" fill="#C0D0C0" />"""
+FOOTER = """</svg>\n"""
+
+MAX_OBJECTS = 1000
+
 # Import constants from phylib to global variables
 BALL_RADIUS = phylib.PHYLIB_BALL_RADIUS
-PHYLIB_TABLE_WIDTH = phylib.PHYLIB_TABLE_WIDTH
-PHYLIB_TABLE_LENGTH = phylib.PHYLIB_TABLE_LENGTH
-# Add more constants here as needed
+TABLE_WIDTH = phylib.PHYLIB_TABLE_WIDTH
+TABLE_LENGTH = phylib.PHYLIB_TABLE_LENGTH
+BALL_DIAMETER = phylib.PHYLIB_BALL_DIAMETER
+HOLE_RADIUS = phylib.PHYLIB_HOLE_RADIUS
+SIM_RATE = phylib.PHYLIB_SIM_RATE
+VEL_EPSILON = phylib.PHYLIB_VEL_EPSILON
+DRAG = phylib.PHYLIB_DRAG
+MAX_TIME = phylib.PHYLIB_MAX_TIME
+MAX_OBJECTS = phylib.PHYLIB_MAX_OBJECTS
 
 # Define standard colours of pool balls
 BALL_COLOURS = [
@@ -40,8 +58,7 @@ class StillBall(phylib.phylib_object):
 
     def __init__(self, number, pos):
         """
-        Constructor function. Requires ball number and position (x,y) as
-        arguments.
+        Constructor function. Requires ball number and position (x,y) as arguments.
         """
 
         # Create a generic phylib_object
@@ -58,13 +75,13 @@ class StillBall(phylib.phylib_object):
 
         # Convert the phylib_object into a StillBall class
         self.__class__ = StillBall
+        self.number = number  # Assign the 'number' attribute here
 
-    # Add an svg method here
     def svg(self):
         """
         Returns SVG representation of the still ball.
         """
-        return f'<circle cx="{self.pos.x}" cy="{self.pos.y}" r="{BALL_RADIUS}" fill="{BALL_COLOURS[self.number]}" />\n'
+        return """ <circle cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (self.obj.still_ball.pos.x , self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number])
 
 
 class RollingBall(phylib.phylib_object):
@@ -91,6 +108,14 @@ class RollingBall(phylib.phylib_object):
 
         # Convert the phylib_object into a RollingBall class
         self.__class__ = RollingBall
+        self.number = number
+
+    def svg(self):
+        """
+        Returns SVG representation of the rolling ball.
+        """
+        return """ <circle cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (self.obj.rolling_ball.pos.x , self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number])
+
 
 class Hole(phylib.phylib_object):
     """
@@ -117,6 +142,13 @@ class Hole(phylib.phylib_object):
         # Convert the phylib_object into a Hole class
         self.__class__ = Hole
 
+    def svg(self):
+        """
+        Returns SVG representation of the hole.
+        """
+        return """ <circle cx="%d" cy="%d" r="%d" fill="black" />\n""" % (self.obj.hole.pos.x , self.obj.hole.pos.y, HOLE_RADIUS)
+
+
 class HCushion(phylib.phylib_object):
     """
     Python HCushion class.
@@ -142,6 +174,10 @@ class HCushion(phylib.phylib_object):
         # Convert the phylib_object into a HCushion class
         self.__class__ = HCushion
 
+    def svg(self):
+        return """ <rect width="1400" height="25" x="-25" y="%d" fill="darkgreen" />\n""" % (self.obj.hcushion.y)      
+
+
 class VCushion(phylib.phylib_object):
     """
     Python VCushion class.
@@ -166,6 +202,12 @@ class VCushion(phylib.phylib_object):
 
         # Convert the phylib_object into a VCushion class
         self.__class__ = VCushion
+
+    def svg(self):
+        """
+        Returns SVG representation of the vertical cushion.
+        """
+        return """ <rect width="25" height="2750" x="%d" y="-25" fill="darkgreen" />\n""" % (self.obj.vcushion.x)
 
 class Table(phylib.phylib_table):
     """
@@ -217,11 +259,18 @@ class Table(phylib.phylib_table):
         the object type.
         """
         result = self.get_object(index)
-        if result == None:
+        if result is None:
             return None
         if result.type == phylib.PHYLIB_STILL_BALL:
             result.__class__ = StillBall
-        # Add more conditions for other types if necessary
+        if result.type == phylib.PHYLIB_ROLLING_BALL:
+            result.__class__ = RollingBall
+        if result.type == phylib.PHYLIB_HOLE:
+            result.__class__ = Hole
+        if result.type == phylib.PHYLIB_HCUSHION:
+            result.__class__ = HCushion
+        if result.type == phylib.PHYLIB_VCUSHION:
+            result.__class__ = VCushion
         return result
 
     def __str__(self):
@@ -246,5 +295,17 @@ class Table(phylib.phylib_table):
             result.current = -1
         return result
 
-    # Add svg method here
+    def svg(self):
+        """
+        Returns SVG representation of the table.
+        """
+        svg_str = ""
+        svg_str += HEADER
+        for obj in self:
+            if obj is not None:
+                svg_str += obj.svg()
+        svg_str += FOOTER
+        return svg_str
+
+
 
