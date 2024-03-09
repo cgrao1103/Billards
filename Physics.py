@@ -1,4 +1,5 @@
 import phylib
+import sqlite3
 
 # Define the header and footer for SVG files
 HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -11,6 +12,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
 FOOTER = """</svg>\n"""
 
 MAX_OBJECTS = 1000
+FRAME_RATE  = 0.01
 
 # Import constants from phylib to global variables
 BALL_RADIUS = phylib.PHYLIB_BALL_RADIUS
@@ -306,6 +308,189 @@ class Table(phylib.phylib_table):
                 svg_str += obj.svg()
         svg_str += FOOTER
         return svg_str
+    
+    def roll( self, t ):
+        new = Table();
+        for ball in self:
+            if isinstance( ball, RollingBall ):
+                # create4 a new ball with the same number as the old ball
+                new_ball = RollingBall( ball.obj.rolling_ball.number, Coordinate(0,0), Coordinate(0,0), Coordinate(0,0) );
+                # compute where it rolls to
+                phylib.phylib_roll( new_ball, ball, t );
+                # add ball to table
+                new += new_ball;
+            if isinstance( ball, StillBall ):
+                # create a new ball with the same number and pos as the old ball
+                new_ball = StillBall( ball.obj.still_ball.number, Coordinate( ball.obj.still_ball.pos.x, ball.obj.still_ball.pos.y ) );
+                # add ball to table
+                new += new_ball;
+                # return table
+        return new;
+    
+"""A3"""  
+
+class Database:
+    def __init__(self, reset=False):
+        if reset:
+            import os
+            if os.path.exists("phylib.db"):
+                os.remove("phylib.db")
+
+        self.conn = sqlite3.connect("phylib.db")
+        self.cursor = self.conn.cursor()
+
+    def createDB(self):
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Ball (
+                                BALL_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                BALL_NO INTEGER,
+                                POS_X FLOAT,
+                                POS_Y FLOAT,
+                                VEL_X FLOAT,
+                                VEL_Y FLOAT
+                            )''')
+
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS TTable (
+                                TABLE_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                TIME FLOAT
+                            )''')
+
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS BallTable (
+                                BALL_ID INTEGER,
+                                TABLE_ID INTEGER,
+                                PRIMARY KEY (BALL_ID, TABLE_ID),
+                                FOREIGN KEY (BALL_ID) REFERENCES Ball (BALL_ID),
+                                FOREIGN KEY (TABLE_ID) REFERENCES TTable (TABLE_ID)
+                            )''')
+
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Shot (
+                                SHOT_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                PLAYER_ID INTEGER,
+                                GAME_ID INTEGER,
+                                FOREIGN KEY (PLAYER_ID) REFERENCES Player (PLAYER_ID),
+                                FOREIGN KEY (GAME_ID) REFERENCES Game (GAME_ID)
+                            )''')
+
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS TableShot (
+                                TABLE_ID INTEGER,
+                                SHOT_ID INTEGER,
+                                FOREIGN KEY (TABLE_ID) REFERENCES TTable (TABLE_ID),
+                                FOREIGN KEY (SHOT_ID) REFERENCES Shot (SHOT_ID)
+                            )''')
+
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Game (
+                                GAME_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                GAME_NAME VARCHAR(64)
+                            )''')
+
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Player (
+                                PLAYER_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                GAME_ID INTEGER,
+                                PLAYER_NAME VARCHAR(64),
+                                FOREIGN KEY (GAME_ID) REFERENCES Game (GAME_ID)
+                            )''')
+
+        self.conn.commit()
+
+    def readTable(self, tableID):
+        self.cursor.execute('''SELECT Ball.BALL_ID, BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y
+                               FROM Ball
+                               JOIN BallTable ON Ball.BALL_ID = BallTable.BALL_ID
+                               WHERE TABLE_ID = ?''', (tableID + 1,))
+        balls_data = self.cursor.fetchall()
+
+        if not balls_data:
+            return None
+
+        self.cursor.execute('''SELECT TIME FROM TTable WHERE TABLE_ID = ?''', (tableID + 1,))
+        table_time = self.cursor.fetchone()[0]
+
+        balls = []
+        for ball_data in balls_data:
+            ball_id, ball_no, pos_x, pos_y, vel_x, vel_y = ball_data
+            if vel_x is None and vel_y is None:
+                balls.append(StillBall(ball_id, ball_no, pos_x, pos_y))
+            else:
+                acceleration = acceleration(vel_x, vel_y)  # Calculate acceleration
+                balls.append(RollingBall(ball_id, ball_no, pos_x, pos_y, vel_x, vel_y, acceleration))
+
+        return Table(balls, table_time)
+
+    def writeTable(self, table):
+        self.cursor.execute('''INSERT INTO TTable (TIME) VALUES (?)''', (table.time,))
+        table_id = self.cursor.lastrowid - 1
+
+        for ball in table.balls:
+            self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y) 
+                                   VALUES (?, ?, ?, ?, ?)''', (ball.ball_no, ball.pos_x, ball.pos_y, ball.vel_x, ball.vel_y))
+            ball_id = self.cursor.lastrowid
+
+            self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
+
+        self.conn.commit()
+        return table_id
+
+    def close(self):
+        self.conn.commit()
+        self.conn.close()
 
 
+class Game:
+    def __init__(self, gameID=None, gameName=None, player1Name=None, player2Name=None):
+        if gameID is not None and (gameName is not None or player1Name is not None or player2Name is not None):
+            raise TypeError("If gameID is provided, other arguments must be None")
+        elif gameID is None and (gameName is None or player1Name is None or player2Name is None):
+            raise TypeError("If gameID is not provided, all Name arguments must be provided")
 
+        if gameID is not None:
+            # Retrieve game details from database
+            game_data = phylib.db.getGame(gameID)
+            if game_data is None:
+                raise ValueError("Invalid gameID")
+            
+            self.gameID = game_data[0]
+            self.gameName = game_data[1]
+            self.player1Name = game_data[2]
+            self.player2Name = game_data[3]
+        else:
+            # Add game details to the database
+            phylib.db.setGame(gameName, player1Name, player2Name)
+            self.gameID = None
+            self.gameName = gameName
+            self.player1Name = player1Name
+            self.player2Name = player2Name
+
+    def shoot(self, gameName, playerName, table, xvel, yvel):
+        database = Database()
+        playerID = database.getPlayerID(playerName)
+        if playerID is None:
+            raise ValueError("Invalid playerName")
+
+        shotID = database.newShot(gameName, playerID)
+
+        cue_ball = table.cueBall()
+        pos_x, pos_y = cue_ball.pos_x, cue_ball.pos_y
+
+        cue_ball.type = phylib.ROLLING_BALL
+        cue_ball.pos_x = pos_x
+        cue_ball.pos_y = pos_y
+        cue_ball.vel_x = xvel
+        cue_ball.vel_y = yvel
+        cue_ball.compute_acceleration()
+        cue_ball.ball_no = 0
+
+        while True:
+            segment = table.segment()
+            if segment is None:
+                break
+
+            segment_length = segment.endTime - segment.startTime
+            num_frames = int(segment_length / self.FRAME_INTERVAL)
+
+            for i in range(num_frames):
+                next_table = table.roll(segment.startTime + i * self.FRAME_INTERVAL)
+                next_table.time = segment.startTime + i * self.FRAME_INTERVAL
+                tableID = database.writeTable(next_table)
+                database.recordTableShot(tableID, shotID)
+
+        database.close()
+        return shotID
