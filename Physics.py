@@ -1,6 +1,7 @@
 import phylib
 import sqlite3
 
+
 # Define the header and footer for SVG files
 HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -45,6 +46,40 @@ BALL_COLOURS = [
     "LIGHTGREEN",
     "SANDYBROWN"
 ]
+
+import math
+
+def compute_acceleration(vel_x, vel_y):
+    """
+    Computes the acceleration of a rolling ball based on its velocity components (vel_x, vel_y).
+
+    Parameters:
+        vel_x (float): The x-component of the velocity.
+        vel_y (float): The y-component of the velocity.
+
+    Returns:
+        tuple: A tuple containing the x and y components of the acceleration.
+    """
+    # Define the coefficients for rolling resistance
+    Crr = 0.02  # Rolling resistance coefficient
+    g = 9.81    # Acceleration due to gravity (m/s^2)
+
+    # Compute the magnitude of the velocity vector
+    vel_mag = math.sqrt(vel_x ** 2 + vel_y ** 2)
+
+    # Compute the rolling resistance force
+    rolling_resistance = Crr * g * vel_mag
+
+    # Compute the angle of the velocity vector
+    theta = math.atan2(vel_y, vel_x)
+
+    # Compute the acceleration components
+    acc_x = -rolling_resistance * math.cos(theta)
+    acc_y = -rolling_resistance * math.sin(theta)
+
+    return acc_x, acc_y
+
+
 
 class Coordinate(phylib.phylib_coord):
     """
@@ -216,14 +251,19 @@ class Table(phylib.phylib_table):
     Pool table class.
     """
 
-    def __init__(self):
+
+    def __init__(self, balls=None, time=None):
         """
         Table constructor method.
-        This method calls the phylib_table constructor and sets the current
-        object index to -1.
+        Initializes with no arguments or with balls and time.
         """
         phylib.phylib_table.__init__(self)
         self.current = -1
+
+        if balls is not None and time is not None:
+            for ball in balls:
+                self += ball
+            self.time = time
 
     def __iadd__(self, other):
         """
@@ -342,54 +382,55 @@ class Database:
     def createDB(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS Ball (
                                 BALL_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                BALL_NO INTEGER,
-                                POS_X FLOAT,
-                                POS_Y FLOAT,
+                                BALL_NO INTEGER NOT NULL,
+                                POS_X FLOAT NOT NULL,
+                                POS_Y FLOAT NOT NULL,
                                 VEL_X FLOAT,
                                 VEL_Y FLOAT
                             )''')
 
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS TTable (
                                 TABLE_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                TIME FLOAT
+                                TIME FLOAT NOT NULL
                             )''')
 
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS BallTable (
-                                BALL_ID INTEGER,
-                                TABLE_ID INTEGER,
-                                PRIMARY KEY (BALL_ID, TABLE_ID),
+                                BALL_ID INTEGER NOT NULL,
+                                TABLE_ID INTEGER NOT NULL,
                                 FOREIGN KEY (BALL_ID) REFERENCES Ball (BALL_ID),
                                 FOREIGN KEY (TABLE_ID) REFERENCES TTable (TABLE_ID)
                             )''')
 
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS Shot (
                                 SHOT_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                PLAYER_ID INTEGER,
-                                GAME_ID INTEGER,
+                                PLAYER_ID INTEGER NOT NULL,
+                                GAME_ID INTEGER NOT NULL,
                                 FOREIGN KEY (PLAYER_ID) REFERENCES Player (PLAYER_ID),
                                 FOREIGN KEY (GAME_ID) REFERENCES Game (GAME_ID)
                             )''')
 
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS TableShot (
-                                TABLE_ID INTEGER,
-                                SHOT_ID INTEGER,
+                                TABLE_ID INTEGER NOT NULL,
+                                SHOT_ID INTEGER NOT NULL,
                                 FOREIGN KEY (TABLE_ID) REFERENCES TTable (TABLE_ID),
                                 FOREIGN KEY (SHOT_ID) REFERENCES Shot (SHOT_ID)
                             )''')
 
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS Game (
                                 GAME_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                GAME_NAME VARCHAR(64)
+                                GAME_NAME VARCHAR(64) NOT NULL
                             )''')
 
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS Player (
                                 PLAYER_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                GAME_ID INTEGER,
-                                PLAYER_NAME VARCHAR(64),
+                                GAME_ID INTEGER NOT NULL,
+                                PLAYER_NAME VARCHAR(64) NOT NULL,
                                 FOREIGN KEY (GAME_ID) REFERENCES Game (GAME_ID)
                             )''')
 
         self.conn.commit()
+    
+    
 
     def readTable(self, tableID):
         self.cursor.execute('''SELECT Ball.BALL_ID, BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y
@@ -408,26 +449,40 @@ class Database:
         for ball_data in balls_data:
             ball_id, ball_no, pos_x, pos_y, vel_x, vel_y = ball_data
             if vel_x is None and vel_y is None:
-                balls.append(StillBall(ball_id, ball_no, pos_x, pos_y))
+                balls.append(StillBall(ball_no, Coordinate(pos_x, pos_y)))
             else:
-                acceleration = acceleration(vel_x, vel_y)  # Calculate acceleration
-                balls.append(RollingBall(ball_id, ball_no, pos_x, pos_y, vel_x, vel_y, acceleration))
+                acceleration = compute_acceleration(vel_x, vel_y)  # Calculate acceleration
+                balls.append(RollingBall(ball_no, Coordinate(pos_x, pos_y), Coordinate(vel_x, vel_y), Coordinate(acceleration[0], acceleration[1])))
+
 
         return Table(balls, table_time)
+
+
+    
+    
 
     def writeTable(self, table):
         self.cursor.execute('''INSERT INTO TTable (TIME) VALUES (?)''', (table.time,))
         table_id = self.cursor.lastrowid - 1
 
-        for ball in table.balls:
-            self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y) 
-                                   VALUES (?, ?, ?, ?, ?)''', (ball.ball_no, ball.pos_x, ball.pos_y, ball.vel_x, ball.vel_y))
-            ball_id = self.cursor.lastrowid
+        for obj in table:
+        # Check if the object is a ball
+            if isinstance(obj, StillBall):
+                ball_id = self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y) 
+                                          VALUES (?, ?, ?)''', (obj.obj.still_ball.number, obj.obj.still_ball.pos.x, obj.obj.still_ball.pos.y)).lastrowid
 
-            self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
+                self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
+            elif isinstance(obj, RollingBall):
+                ball_id = self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y) 
+                                          VALUES (?, ?, ?, ?, ?)''', (obj.obj.rolling_ball.number, obj.obj.rolling_ball.pos.x, obj.obj.rolling_ball.pos.y, obj.obj.rolling_ball.vel.x, obj.obj.rolling_ball.vel.y)).lastrowid
+
+                self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
 
         self.conn.commit()
         return table_id
+
+
+
 
     def close(self):
         self.conn.commit()
@@ -494,3 +549,4 @@ class Game:
 
         database.close()
         return shotID
+    

@@ -36,3 +36,4 @@ _phylib.so: phylib_wrap.o libphylib.so
 .PHONY: clean
 clean:
 	rm -f phylib.o libphylib.so phylib_wrap.c phylib_wrap.o _phylib.so phylib.py
+
