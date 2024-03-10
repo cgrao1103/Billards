@@ -367,6 +367,41 @@ class Table(phylib.phylib_table):
                 # return table
         return new;
     
+    def cueBall(self, xpos, ypos, xvel, yvel):
+        for obj in self:
+            print(obj)  # Debugging print to check all objects in the table
+            if isinstance(obj, RollingBall) and obj.number == 0:
+            # Store the cue ball's position in temporary variables
+                obj_type = obj.type
+                obj_pos_x = obj.obj.rolling_ball.pos.x
+                obj_pos_y = obj.obj.rolling_ball.pos.y
+                obj_vel_x = obj.obj.rolling_ball.vel.x
+                obj_vel_y = obj.obj.rolling_ball.vel.y
+
+            # Update the attributes of the cue ball
+                obj.type = phylib.PHYLIB_ROLLING_BALL
+                obj.obj.rolling_ball.pos.x = xpos
+                obj.obj.rolling_ball.pos.y = ypos
+                obj.obj.rolling_ball.vel.x = xvel
+                obj.obj.rolling_ball.vel.y = yvel
+                obj.compute_acceleration()
+
+            # Set the number of the cue ball to 0
+                obj.number = 0
+
+            # Restore the original type and position if needed
+                obj.type = obj_type
+                obj.obj.rolling_ball.pos.x = obj_pos_x
+                obj.obj.rolling_ball.pos.y = obj_pos_y
+                obj.obj.rolling_ball.vel.x = obj_vel_x
+                obj.obj.rolling_ball.vel.y = obj_vel_y
+
+                return obj  # Return the cue ball if found
+
+        print("Cue ball not found in the table.")
+        return None  # Return None if the cue ball is not found
+
+    
 """A3"""  
 
 class Database:
@@ -480,9 +515,86 @@ class Database:
 
         self.conn.commit()
         return table_id
+    
+    def setGame(self, gameName, player1Name, player2Name):
+        """
+        Insert a new game record into the database.
 
+        Parameters:
+            gameName (str): The name of the game.
+            player1Name (str): The name of the first player.
+            player2Name (str): The name of the second player.
+        """
+        # Open a connection to the database
+        conn = sqlite3.connect("phylib.db")
+        cursor = conn.cursor()
 
+        # Insert the game record into the database
+        cursor.execute('''INSERT INTO Game (GAME_NAME) VALUES (?)''', (gameName,))
+        gameID = cursor.lastrowid
 
+        # Insert the player records into the database
+        cursor.execute('''INSERT INTO Player (GAME_ID, PLAYER_NAME) VALUES (?, ?)''', (gameID, player1Name))
+        cursor.execute('''INSERT INTO Player (GAME_ID, PLAYER_NAME) VALUES (?, ?)''', (gameID, player2Name))
+
+        # Commit the transaction and close the connection
+        conn.commit()
+        conn.close()
+
+        return gameID
+    
+    def getPlayerID(self, playerName):
+        """
+        Retrieve the player ID based on the player's name.
+
+        Parameters:
+            playerName (str): The name of the player.
+
+        Returns:
+            int or None: The player ID if found, None otherwise.
+        """
+        # Open a connection to the database
+        conn = sqlite3.connect("phylib.db")
+        cursor = conn.cursor()
+
+        # Query the database to retrieve the player ID
+        cursor.execute('''SELECT PLAYER_ID FROM Player WHERE PLAYER_NAME = ?''', (playerName,))
+        player_id = cursor.fetchone()
+
+        # Close the connection
+        conn.close()
+
+        # Return the player ID if found, otherwise return None
+        return player_id[0] if player_id else None
+    
+    def newShot(self, gameID, playerID):
+        """
+        Add a new entry to the Shot table for the current game and the given player ID.
+
+        Parameters:
+            gameID (int): The ID of the game.
+            playerID (int): The ID of the player.
+
+        Returns:
+            int: The ID of the newly added shot.
+        """
+        # Open a connection to the database
+        conn = sqlite3.connect("phylib.db")
+        cursor = conn.cursor()
+
+        # Insert a new entry into the Shot table
+        cursor.execute('''INSERT INTO Shot (PLAYER_ID, GAME_ID) VALUES (?, ?)''', (playerID, gameID))
+        shot_id = cursor.lastrowid
+
+        # Close the connection
+        conn.commit()
+        conn.close()
+
+        # Return the ID of the newly added shot
+        return shot_id
+    
+    
+    
 
     def close(self):
         self.conn.commit()
@@ -491,14 +603,16 @@ class Database:
 
 class Game:
     def __init__(self, gameID=None, gameName=None, player1Name=None, player2Name=None):
+        # Retrieve game details from database
+        database = Database()
         if gameID is not None and (gameName is not None or player1Name is not None or player2Name is not None):
             raise TypeError("If gameID is provided, other arguments must be None")
         elif gameID is None and (gameName is None or player1Name is None or player2Name is None):
             raise TypeError("If gameID is not provided, all Name arguments must be provided")
 
         if gameID is not None:
-            # Retrieve game details from database
-            game_data = phylib.db.getGame(gameID)
+            
+            game_data = database.getGame(gameID)
             if game_data is None:
                 raise ValueError("Invalid gameID")
             
@@ -508,12 +622,12 @@ class Game:
             self.player2Name = game_data[3]
         else:
             # Add game details to the database
-            phylib.db.setGame(gameName, player1Name, player2Name)
+            database.setGame(gameName, player1Name, player2Name)
             self.gameID = None
             self.gameName = gameName
             self.player1Name = player1Name
             self.player2Name = player2Name
-
+            
     def shoot(self, gameName, playerName, table, xvel, yvel):
         database = Database()
         playerID = database.getPlayerID(playerName)
@@ -522,16 +636,30 @@ class Game:
 
         shotID = database.newShot(gameName, playerID)
 
-        cue_ball = table.cueBall()
-        pos_x, pos_y = cue_ball.pos_x, cue_ball.pos_y
+    # Retrieve the position of the cue ball
+        xpos = 100  # Define xpos with appropriate value
+        ypos = 100  # Define ypos with appropriate value
 
-        cue_ball.type = phylib.ROLLING_BALL
-        cue_ball.pos_x = pos_x
-        cue_ball.pos_y = pos_y
-        cue_ball.vel_x = xvel
-        cue_ball.vel_y = yvel
+    # Retrieve the cue ball from the table and update its attributes
+        cue_ball = table.cueBall(xpos, ypos, xvel, yvel)
+
+        if cue_ball is None:
+            raise ValueError("Cue ball not found in the table")
+
+    # Set the type attribute of the cue ball to ROLLING_BALL
+        cue_ball.type = phylib.PHYLIB_ROLLING_BALL
+
+    # Set the attributes of the cue ball
+        cue_ball.obj.rolling_ball.pos.x = xpos
+        cue_ball.obj.rolling_ball.pos.y = ypos
+        cue_ball.obj.rolling_ball.vel.x = xvel
+        cue_ball.obj.rolling_ball.vel.y = yvel
+
+    # Recalculate the acceleration parameters
         cue_ball.compute_acceleration()
-        cue_ball.ball_no = 0
+
+    # Set the number of the cue ball to 0
+        cue_ball.number = 0
 
         while True:
             segment = table.segment()
@@ -549,4 +677,3 @@ class Game:
 
         database.close()
         return shotID
-    
