@@ -81,6 +81,7 @@ def compute_acceleration(vel_x, vel_y):
 
 
 
+
 class Coordinate(phylib.phylib_coord):
     """
     This creates a Coordinate subclass, that adds nothing new, but looks
@@ -251,19 +252,14 @@ class Table(phylib.phylib_table):
     Pool table class.
     """
 
-
-    def __init__(self, balls=None, time=None):
+    def __init__(self):
         """
         Table constructor method.
-        Initializes with no arguments or with balls and time.
+        This method calls the phylib_table constructor and sets the current
+        object index to -1.
         """
         phylib.phylib_table.__init__(self)
         self.current = -1
-
-        if balls is not None and time is not None:
-            for ball in balls:
-                self += ball
-            self.time = time
 
     def __iadd__(self, other):
         """
@@ -348,6 +344,10 @@ class Table(phylib.phylib_table):
                 svg_str += obj.svg()
         svg_str += FOOTER
         return svg_str
+
+
+
+
     
     def roll( self, t ):
         new = Table();
@@ -490,7 +490,7 @@ class Database:
                 balls.append(RollingBall(ball_no, Coordinate(pos_x, pos_y), Coordinate(vel_x, vel_y), Coordinate(acceleration[0], acceleration[1])))
 
 
-        return Table(balls, table_time)
+        return Table()
 
 
     
