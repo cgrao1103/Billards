@@ -478,12 +478,12 @@ class Database:
 
         table = Table()
         for ball_data in balls_data:
-            BALLID, BALLNO, XPOS, YPOS, XVEL, vel_y = ball_data
-            if XVEL is None and vel_y is None:
-                table += StillBall(BALLNO, Coordinate(XPOS, YPOS))
+            ball_id, ball_no, pos_x, pos_y, vel_x, vel_y = ball_data
+            if vel_x is None and vel_y is None:
+                table += StillBall(ball_no, Coordinate(pos_x, pos_y))
             else:
-                acceleration = compute_acceleration(ball_data,XVEL, vel_y,VEL_EPSILON, DRAG)  # Calculate acceleration
-                table += RollingBall(BALLNO, Coordinate(XPOS, YPOS), Coordinate(XVEL, vel_y), Coordinate(acceleration[0], acceleration[1]))
+                acceleration = compute_acceleration(ball_data,vel_x, vel_y,VEL_EPSILON, DRAG)  # Calculate acceleration
+                table += RollingBall(ball_no, Coordinate(pos_x, pos_y), Coordinate(vel_x, vel_y), Coordinate(acceleration[0], acceleration[1]))
 
         table.time = table_time
         return table
