@@ -1,56 +1,45 @@
 import math
 import Physics
 
-# Call the Physics.Table constructor and store the result in a variable table.
-table = Physics.Table()
+def main():
 
-# Call the Physics.Coordinate constructor and store the result in a variable pos.
-# Compute the x and y values like we did in A1Test1.c.
-# Use math.sqrt to compute the square root.
-pos = Physics.Coordinate()
-pos.x = Physics.PHYLIB_TABLE_WIDTH / 2.0 - math.sqrt(Physics.PHYLIB_BALL_DIAMETER * Physics.PHYLIB_BALL_DIAMETER / 2.0)
-pos.y = Physics.PHYLIB_TABLE_WIDTH / 2.0 - math.sqrt(Physics.PHYLIB_BALL_DIAMETER * Physics.PHYLIB_BALL_DIAMETER / 2.0)
+    # Create the table
+    table = Physics.Table()
 
-# Call the StillBall constructor and store the result in a variable sb.
-sb = Physics.StillBall(1, pos)
+    # Calculate the position for the StillBall 
+    pos_x = Physics.TABLE_WIDTH / 2.0 - math.sqrt((Physics.BALL_DIAMETER ** 2 )/ 2.0)
+    pos_y = Physics.TABLE_LENGTH / 4.0 - math.sqrt((Physics.BALL_DIAMETER ** 2 )/ 2.0)
+    pos = Physics.Coordinate(pos_x, pos_y)
 
-# Call the Coordinate constructor 3 times to set the variables, pos, vel, and acc for the RollingBall.
-pos = Physics.Coordinate()
-pos.x = Physics.PHYLIB_TABLE_WIDTH / 2.0
-pos.y = Physics.PHYLIB_TABLE_LENGTH - Physics.PHYLIB_TABLE_WIDTH / 2.0
+    # Create and store the StillBall
+    sb = Physics.StillBall(1, pos)
 
-vel = Physics.Coordinate()
-vel.x = 0.0
-vel.y = -1000.0  # 1m/s (medium speed)
+    # Calculate position, velocity, and acceleration for RollingBall
+    pos_rb = Physics.Coordinate(Physics.TABLE_WIDTH / 2.0, Physics.TABLE_LENGTH - Physics.TABLE_WIDTH / 2.0)
+    vel = Physics.Coordinate(0.0, -1000.0)  # moving up along the table's center
+    acc = Physics.Coordinate(0.0, 180.0)
+    # pos_hole = Physics.Coordinate(0.0,0.0)
+    # hl = Physics.Hole(pos_hole)
+    # Create and store the RollingBall
+    rb = Physics.RollingBall(0, pos_rb, vel, acc)
 
-acc = Physics.Coordinate()
-acc.x = 0.0
-acc.y = 180.0
+    # Add the StillBall to the table
+    table += sb
 
-# Call the RollingBall constructor and store the result in a variable rb.
-rb = Physics.RollingBall(0, pos, vel, acc)
+    # Add the RollingBall to the table
+    table += rb
 
-# Add the StillBall to the table using “table += sb”.
-table += sb
+    # Open a file to write SVG representation
+    file_index = 0
+    while table is not None:
+        # Write the SVG representation to a file
+        with open(f"table-{file_index}.svg", "w") as svg_file:
+            svg_content = table.svg()
+            svg_file.write(svg_content)
+        
+        # Continue simulation
+        table = table.segment()
+        file_index += 1
 
-# Add the RollingBall to the table using “table += rb”.
-table += rb
-
-# Open a file called "table-%d.svg" with an index that starts at 0 and increments by 1 substituted for %d.
-index = 0
-filename = "table-{}.svg".format(index)
-with open(filename, "w") as f:
-    # Write the string returned by the svg method of the table to the file.
-    f.write(table.svg())
-
-# Start a while loop conditioned on the value of table (it will run until table is None).
-while table:
-    # Inside the while loop set the value of table to be the return value of calling the segment method of table.
-    table = table.segment()
-
-    # Increment the index for the filename.
-    index += 1
-    filename = "table-{}.svg".format(index)
-    with open(filename, "w") as f:
-        # Write the string returned by the svg method of the table to the file.
-        f.write(table.svg())
+if __name__ == "__main__":
+    main()

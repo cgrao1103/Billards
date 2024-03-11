@@ -1,6 +1,7 @@
 import phylib
 import sqlite3
 
+import math
 
 # Define the header and footer for SVG files
 HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -13,7 +14,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
 FOOTER = """</svg>\n"""
 
 MAX_OBJECTS = 1000
-FRAME_RATE  = 0.01
+FRAME_RATE=0.01
 
 # Import constants from phylib to global variables
 BALL_RADIUS = phylib.PHYLIB_BALL_RADIUS
@@ -47,9 +48,8 @@ BALL_COLOURS = [
     "SANDYBROWN"
 ]
 
-import math
 
-def compute_acceleration(vel_x, vel_y):
+def compute_acceleration(self , vel_x, vel_y,VEL_EPSILON, DRAG):
     """
     Computes the acceleration of a rolling ball based on its velocity components (vel_x, vel_y).
 
@@ -60,27 +60,19 @@ def compute_acceleration(vel_x, vel_y):
     Returns:
         tuple: A tuple containing the x and y components of the acceleration.
     """
-    # Define the coefficients for rolling resistance
-    Crr = 0.02  # Rolling resistance coefficient
-    g = 9.81    # Acceleration due to gravity (m/s^2)
+    
+    # Compute the speed of the rolling ball
+    speed_rb = math.sqrt(vel_x ** 2 + vel_y ** 2)
 
-    # Compute the magnitude of the velocity vector
-    vel_mag = math.sqrt(vel_x ** 2 + vel_y ** 2)
-
-    # Compute the rolling resistance force
-    rolling_resistance = Crr * g * vel_mag
-
-    # Compute the angle of the velocity vector
-    theta = math.atan2(vel_y, vel_x)
-
-    # Compute the acceleration components
-    acc_x = -rolling_resistance * math.cos(theta)
-    acc_y = -rolling_resistance * math.sin(theta)
-
+        # Compute acceleration with drag
+    if speed_rb > VEL_EPSILON:
+        acc_x = -vel_x / speed_rb * DRAG
+        acc_y = -vel_y / speed_rb * DRAG
+    else:
+        acc_x = 0.0
+        acc_y = 0.0
+        
     return acc_x, acc_y
-
-
-
 
 class Coordinate(phylib.phylib_coord):
     """
@@ -348,6 +340,8 @@ class Table(phylib.phylib_table):
 
 
 
+
+
     
     def roll( self, t ):
         new = Table();
@@ -468,10 +462,11 @@ class Database:
     
 
     def readTable(self, tableID):
+   
         self.cursor.execute('''SELECT Ball.BALL_ID, BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y
-                               FROM Ball
-                               JOIN BallTable ON Ball.BALL_ID = BallTable.BALL_ID
-                               WHERE TABLE_ID = ?''', (tableID + 1,))
+                           FROM Ball
+                           JOIN BallTable ON Ball.BALL_ID = BallTable.BALL_ID
+                           WHERE TABLE_ID = ?''', (tableID + 1,))
         balls_data = self.cursor.fetchall()
 
         if not balls_data:
@@ -480,23 +475,22 @@ class Database:
         self.cursor.execute('''SELECT TIME FROM TTable WHERE TABLE_ID = ?''', (tableID + 1,))
         table_time = self.cursor.fetchone()[0]
 
-        balls = []
+        table = Table()
         for ball_data in balls_data:
             ball_id, ball_no, pos_x, pos_y, vel_x, vel_y = ball_data
             if vel_x is None and vel_y is None:
-                balls.append(StillBall(ball_no, Coordinate(pos_x, pos_y)))
+                table += StillBall(ball_no, Coordinate(pos_x, pos_y))
             else:
-                acceleration = compute_acceleration(vel_x, vel_y)  # Calculate acceleration
-                balls.append(RollingBall(ball_no, Coordinate(pos_x, pos_y), Coordinate(vel_x, vel_y), Coordinate(acceleration[0], acceleration[1])))
+                acceleration = compute_acceleration(ball_data,vel_x, vel_y,VEL_EPSILON, DRAG)  # Calculate acceleration
+                table += RollingBall(ball_no, Coordinate(pos_x, pos_y), Coordinate(vel_x, vel_y), Coordinate(acceleration[0], acceleration[1]))
+
+        table.time = table_time
+        return table
 
 
-        return Table()
-
-
-    
-    
 
     def writeTable(self, table):
+    
         self.cursor.execute('''INSERT INTO TTable (TIME) VALUES (?)''', (table.time,))
         table_id = self.cursor.lastrowid - 1
 
@@ -504,18 +498,24 @@ class Database:
         # Check if the object is a ball
             if isinstance(obj, StillBall):
                 ball_id = self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y) 
-                                          VALUES (?, ?, ?)''', (obj.obj.still_ball.number, obj.obj.still_ball.pos.x, obj.obj.still_ball.pos.y)).lastrowid
+                                      VALUES (?, ?, ?)''', (obj.obj.still_ball.number, obj.obj.still_ball.pos.x, obj.obj.still_ball.pos.y)).lastrowid
 
                 self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
             elif isinstance(obj, RollingBall):
                 ball_id = self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y) 
-                                          VALUES (?, ?, ?, ?, ?)''', (obj.obj.rolling_ball.number, obj.obj.rolling_ball.pos.x, obj.obj.rolling_ball.pos.y, obj.obj.rolling_ball.vel.x, obj.obj.rolling_ball.vel.y)).lastrowid
+                                      VALUES (?, ?, ?, ?, ?)''', (obj.obj.rolling_ball.number, obj.obj.rolling_ball.pos.x, obj.obj.rolling_ball.pos.y, obj.obj.rolling_ball.vel.x, obj.obj.rolling_ball.vel.y)).lastrowid
 
                 self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
 
         self.conn.commit()
         return table_id
     
+    
+    def close(self):
+        self.conn.commit()
+        self.conn.close()
+
+
     def setGame(self, gameName, player1Name, player2Name):
         """
         Insert a new game record into the database.
@@ -593,12 +593,6 @@ class Database:
         # Return the ID of the newly added shot
         return shot_id
     
-    
-    
-
-    def close(self):
-        self.conn.commit()
-        self.conn.close()
 
 
 class Game:
