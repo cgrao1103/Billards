@@ -500,12 +500,12 @@ class Database:
                 ball_id = self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y) 
                                       VALUES (?, ?, ?)''', (obj.obj.still_ball.number, obj.obj.still_ball.pos.x, obj.obj.still_ball.pos.y)).lastrowid
 
-                self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
+                self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id+1))
             elif isinstance(obj, RollingBall):
                 ball_id = self.cursor.execute('''INSERT INTO Ball (BALL_NO, POS_X, POS_Y, VEL_X, VEL_Y) 
                                       VALUES (?, ?, ?, ?, ?)''', (obj.obj.rolling_ball.number, obj.obj.rolling_ball.pos.x, obj.obj.rolling_ball.pos.y, obj.obj.rolling_ball.vel.x, obj.obj.rolling_ball.vel.y)).lastrowid
 
-                self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id))
+                self.cursor.execute('''INSERT INTO BallTable (BALL_ID, TABLE_ID) VALUES (?, ?)''', (ball_id, table_id+1))
 
         self.conn.commit()
         return table_id
