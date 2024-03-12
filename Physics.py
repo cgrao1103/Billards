@@ -361,40 +361,15 @@ class Table(phylib.phylib_table):
                 # return table
         return new;
     
-    def cueBall(self, xpos, ypos, xvel, yvel):
+    def cueBall(self):
         for obj in self:
-            print(obj)  # Debugging print to check all objects in the table
             if isinstance(obj, RollingBall) and obj.obj.rolling_ball.number == 0:
-            # Store the cue ball's position in temporary variables
-                obj_type = obj.type
-                obj_XPOS = obj.obj.rolling_ball.pos.x
-                obj_YPOS = obj.obj.rolling_ball.pos.y
-                obj_XVEL = obj.obj.rolling_ball.vel.x
-                obj_vel_y = obj.obj.rolling_ball.vel.y
-
-            # Update the attributes of the cue ball
-                obj.type = phylib.PHYLIB_ROLLING_BALL
-                obj.obj.rolling_ball.pos.x = xpos
-                obj.obj.rolling_ball.pos.y = ypos
-                obj.obj.rolling_ball.vel.x = xvel
-                obj.obj.rolling_ball.vel.y = yvel
-                obj.compute_acceleration()
-
-            # Set the number of the cue ball to 0
-                obj.number = 0
-
-            # Restore the original type and position if needed
-                obj.type = obj_type
-                obj.obj.rolling_ball.pos.x = obj_XPOS
-                obj.obj.rolling_ball.pos.y = obj_YPOS
-                obj.obj.rolling_ball.vel.x = obj_XVEL
-                obj.obj.rolling_ball.vel.y = obj_vel_y
-
+                return obj  # Return the cue ball if found
+            if isinstance(obj, StillBall) and obj.obj.still_ball.number == 0:
                 return obj  # Return the cue ball if found
 
         print("Cue ball not found in the table.")
         return None  # Return None if the cue ball is not found
-
 
     
 """A3"""  
@@ -611,71 +586,72 @@ class Game:
             if game_data is None:
                 raise ValueError("Invalid gameID")
             
-            self.gameID = game_data[0]
+            self.gameID = game_data[0] + 1
             self.gameName = game_data[1]
             self.player1Name = game_data[2]
             self.player2Name = game_data[3]
         else:
             # Add game details to the database
-            database.setGame(gameName, player1Name, player2Name)
+            
             self.gameID = None
             self.gameName = gameName
             self.player1Name = player1Name
             self.player2Name = player2Name
+            database.setGame(gameName, player1Name, player2Name)
             
     def shoot(self, gameName, playerName, table, xvel, yvel):
-        # Add a new entry to the Shot table for the current game and player
-        SHOTID = Database.newShot(self,gameName, playerName)  # Assuming Database class has a newShot method
+    # Add a new entry to the Shot table for the current game and player
+        SHOTID = Database.newShot(self, gameName, playerName)  # Assuming Database class has a newShot method
+
+    # Find the object representing the cue ball
+        cue_ball = table.cueBall()  # Assuming Table class has a cueBall method
+
+    # Store cue ball's current position
+        posex, posey = cue_ball.obj.rolling_ball.pos.x, cue_ball.obj.rolling_ball.pos.y
+
+    # Set type attribute of cue ball to ROLLING_BALL
+        cue_ball.obj.rolling_ball.type = phylib.PHYLIB_ROLLING_BALL
         
-        # Find the object representing the cue ball
-        cue_ball = table.cueBall( 'xpos', 'ypos', 'xvel', 'yvel')  # Assuming Table class has a cueBall method
-        
-        # Store cue ball's current position
-        cue_ball_x, cue_ball_y = cue_ball.pos.x, cue_ball.pos.y
-        
-        # Set type attribute of cue ball to ROLLING_BALL
-        cue_ball.type = phylib.ROLLING_BALL
-        
-        # Set cue ball's attributes
-        cue_ball.pos.x = cue_ball_x
-        cue_ball.pos.y = cue_ball_y
-        cue_ball.vel.x = xvel
-        cue_ball.vel.y = yvel
-        
-        # Recalculate acceleration parameters (as in A1, and A2)
-        # Assume there's a method to recalculate acceleration
-        
-        # Set the number of the cue ball to 0
-        cue_ball.number = 0
-        
-        # Loop until segment method returns None
-        segment_length = 0
+        #cue_ball.obj.rolling_ball.number = 0
+
+    # Set cue ball's attributes
+        cue_ball.obj.rolling_ball.pos.x = posex
+        cue_ball.obj.rolling_ball.pos.y = posey
+        cue_ball.obj.rolling_ball.vel.x = xvel
+        cue_ball.obj.rolling_ball.vel.y = yvel
+
+    # Recalculate acceleration parameters (as in A1, and A2)
+        acc_x, acc_y = compute_acceleration(self, xvel, yvel, VEL_EPSILON, DRAG)  # Calculate acceleration
+
+        cue_ball.obj.rolling_ball.acc.x = acc_x
+        cue_ball.obj.rolling_ball.acc.y = acc_y
+
+    # Loop until segment method returns None
+        total_segment_length = 0
         while True:
             segment_table = table.segment()  # Assuming segment method exists in Table class
             if segment_table is None:
                 break
-            
-            # Calculate segment length
-            segment_length += segment_table.time_end - segment_table.time_start
-        
-        # Calculate number of frames
-        num_frames = int(segment_length / FRAME_INTERVAL)
-        
-        # Loop over frames
+            total_segment_length += FRAME_INTERVAL
+
+    # Calculate number of frames
+        num_frames = int(total_segment_length / FRAME_INTERVAL)
+
+    # Loop over frames
         for i in range(num_frames):
-            # Multiply frame index by FRAME_INTERVAL
+        # Multiply frame index by FRAME_INTERVAL
             frame_time = i * FRAME_INTERVAL
-            
-            # Create new table object for next frame
+
+        # Create new table object for next frame
             next_frame_table = table.roll(frame_time)  # Assuming roll method exists in Table class
-            
-            # Set time of returned table
+
+        # Set time of returned table
             next_frame_table.time = segment_table.time_start + frame_time
-            
-            # Save table to database and record it in TableShot
+
+        # Save table to database and record it in TableShot
             Database.writeTable(next_frame_table)  # Assuming writeTable method exists in Database class
             Database.TableShot.recordTableShot(TABLEID=next_frame_table.id, SHOTID=SHOTID)  # Assuming TableShot class has a recordTableShot method
 
+    
 
-        
-        return SHOTID
+            return SHOTID
