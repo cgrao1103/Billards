@@ -14,8 +14,8 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
  <circle cx="1350" cy="0" r="114" fill="black" />
  <circle cx="1350" cy="1350" r="114" fill="black" />
  <circle cx="1350" cy="2700" r="114" fill="black" />
- <circle cx="605" cy="677" r="28" fill="YELLOW" />
- <circle cx="558" cy="476" r="28" fill="BLUE" />
- <circle cx="896" cy="297" r="28" fill="RED" />
- <circle cx="669" cy="755" r="28" fill="WHITE" />
+ <circle cx="606" cy="691" r="28" fill="YELLOW" />
+ <circle cx="550" cy="476" r="28" fill="BLUE" />
+ <circle cx="861" cy="364" r="28" fill="RED" />
+ <circle cx="687" cy="743" r="28" fill="WHITE" />
 </svg>
