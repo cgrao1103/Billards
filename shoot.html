@@ -19,7 +19,7 @@
             margin: 0 auto;
             border: 2px solid black;
             position: relative;
-            overflow: hidden; /* Hide overflow to prevent horizontal scroll */
+            overflow: hidden;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
@@ -36,12 +36,12 @@
         }
 
         #cueBall {
-            r: 28;
+            r: 40; /* Increased radius */
         }
 
         #guideLine {
             stroke: white;
-            stroke-width: 3;
+            stroke-width: 6; /* Increased stroke width */
         }
     </style>
 </head>
@@ -53,8 +53,8 @@
             <rect width="1400" height="25" x="-25" y="2700" fill="darkgreen" />
             <rect width="25" height="2750" x="0" y="-25" fill="darkgreen" />
             <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
-            <circle class="ball" id="cueBall" cx="675" cy="2025" r="28" fill="WHITE" />
-            <circle cx="634" cy="634" r="28" fill="YELLOW" />
+            <circle class="ball" id="cueBall" cx="675" cy="2025" r="40" fill="WHITE" /> <!-- Increased radius -->
+            <circle cx="634" cy="634" r="40" fill="YELLOW" /> <!-- Increased radius -->
             <circle cx="0" cy="0" r="114" fill="black" />
             <circle cx="0" cy="1350" r="114" fill="black" />
             <circle cx="0" cy="2700" r="114" fill="black" />
@@ -79,7 +79,7 @@
                     guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                     guideLine.setAttribute('id', 'guideLine');
                     guideLine.setAttribute('stroke', 'white');
-                    guideLine.setAttribute('stroke-width', '3');
+                    guideLine.setAttribute('stroke-width', '6');
                     poolTable.appendChild(guideLine);
                 }
                 const cueBallRect = cueBall.getBoundingClientRect();
