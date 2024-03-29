@@ -25,6 +25,10 @@
         #cueBall {
             r: 28;
         }
+        #guideLine {
+            stroke: white;
+            stroke-width: 3;
+        }
     </style>
 </head>
 <body>
@@ -50,28 +54,23 @@
             const poolTable = document.getElementById('poolTable');
             const cueBall = document.getElementById('cueBall');
             let isDragging = false;
-            let guideLine = null;
-            let initialX, initialY;
+            let guideLine = document.getElementById("guideLine");
+            var initialX, initialY;
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
                 initialX = event.clientX;
                 initialY = event.clientY;
-                // Create the guideLine element dynamically
-                guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                guideLine.setAttribute('id', 'guideLine');
-                guideLine.setAttribute('stroke', 'white');
-                guideLine.setAttribute('stroke-width', '3');
-                poolTable.appendChild(guideLine);
             });
 
             document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
                     const cueBallRect = cueBall.getBoundingClientRect();
-                    const poolTableRect = poolTable.getBoundingClientRect();
+                   
+                    //const rect = poolTable.getBoundingClientRect();
 
-                    const mouseX = event.clientX - poolTableRect.left;
-                    const mouseY = event.clientY - poolTableRect.top;
+                    const mouseX = event.clientX - initialX + parseFloat(cueBall.getAttribute('cx'));
+                    const mouseY = event.clientY - initialY + parseFloat(cueBall.getAttribute('cy'));
 
                     guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
                     guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
