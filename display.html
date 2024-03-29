@@ -50,52 +50,51 @@
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
             <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" r="10" />
-            <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall3" cx="700" cy="300" r="10" />
+            <circle class="ball otherBall" id="otherBall1" />
+            <circle class="ball otherBall" id="otherBall2" />
+            <circle class="ball otherBall" id="otherBall3" />
             <!-- Add other balls and table elements here -->
         </svg>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const poolTable = document.getElementById('poolTable');
-            const cueBall = document.getElementById('cueBall');
-            const otherBalls = document.querySelectorAll('.otherBall');
+        $(document).ready(function() {
+            const poolTable = $('#poolTable');
+            const cueBall = $('#cueBall');
+            const otherBalls = $('.otherBall');
 
             let isDragging = false;
             let guideLine = null;
 
-            cueBall.addEventListener('mousedown', function(event) {
+            cueBall.mousedown(function(event) {
                 isDragging = true;
             });
 
-            document.addEventListener('mousemove', function(event) {
+            $(document).mousemove(function(event) {
                 if (isDragging) {
                     if (!guideLine) {
-                        guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                        guideLine.setAttribute('id', 'guideLine');
-                        guideLine.setAttribute('stroke', 'white');
-                        guideLine.setAttribute('stroke-width', '3');
-                        poolTable.appendChild(guideLine);
+                        guideLine = $('<line id="guideLine" stroke="white" stroke-width="3" />');
+                        poolTable.append(guideLine);
                     }
-                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
-                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
-                    guideLine.setAttribute('x1', cueBallCenterX);
-                    guideLine.setAttribute('y1', cueBallCenterY);
-                    guideLine.setAttribute('x2', event.clientX);
-                    guideLine.setAttribute('y2', event.clientY);
+                    const cueBallRect = cueBall[0].getBoundingClientRect();
+                    const cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
+                    const cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
+                    guideLine.attr('x1', cueBallCenterX);
+                    guideLine.attr('y1', cueBallCenterY);
+                    guideLine.attr('x2', event.clientX);
+                    guideLine.attr('y2', event.clientY);
                 }
             });
 
-            document.addEventListener('mouseup', function(event) {
+            $(document).mouseup(function(event) {
                 if (isDragging) {
                     isDragging = false;
                     if (guideLine) {
-                        poolTable.removeChild(guideLine);
+                        guideLine.remove();
                         guideLine = null;
                     }
-                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
-                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
+                    const cueBallCenterX = parseFloat(cueBall.attr('cx')) + 10; // Adjust for cue ball radius
+                    const cueBallCenterY = parseFloat(cueBall.attr('cy')) + 10; // Adjust for cue ball radius
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
                     const velocityX = releasePositionX - cueBallCenterX;
@@ -109,7 +108,7 @@
         });
 
         function sendInitialVelocityToServer(velocityX, velocityY) {
-            // Implement sending initial velocity to server
+            // Implement sending initial velocity to server using Ajax
             console.log('Sending initial velocity to server:', velocityX, velocityY);
         }
     </script>
