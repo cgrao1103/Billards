@@ -18,27 +18,26 @@
             background-color: green;
         }
         .ball {
+            fill: white;
             cursor: pointer;
         }
         #cueBall {
-            fill: white;
             r: 10;
         }
         .otherBall {
-            fill: black;
             r: 10;
         }
         #otherBall1 {
-            cx: 100;
-            cy: 200;
+            cx: 700;
+            cy: 100;
         }
         #otherBall2 {
-            cx: 200;
+            cx: 700;
             cy: 200;
         }
         #otherBall3 {
-            cx: 300;
-            cy: 200;
+            cx: 700;
+            cy: 300;
         }
         #guideLine {
             stroke: white;
@@ -51,9 +50,9 @@
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
             <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall2" cx="200" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall3" cx="300" cy="200" r="10" />
+            <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" r="10" />
+            <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" r="10" />
+            <circle class="ball otherBall" id="otherBall3" cx="700" cy="300" r="10" />
             <!-- Add other balls and table elements here -->
         </svg>
     </div>
@@ -75,6 +74,8 @@
                     if (!guideLine) {
                         guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                         guideLine.setAttribute('id', 'guideLine');
+                        guideLine.setAttribute('stroke', 'white');
+                        guideLine.setAttribute('stroke-width', '3');
                         poolTable.appendChild(guideLine);
                     }
                     const cueBallRect = cueBall.getBoundingClientRect();
@@ -94,8 +95,8 @@
                         poolTable.removeChild(guideLine);
                         guideLine = null;
                     }
-                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx')) + 10; // Adjust for cue ball radius
-                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy')) + 10; // Adjust for cue ball radius
+                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx')); // Adjust for cue ball radius
+                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy')); // Adjust for cue ball radius
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
                     const velocityX = releasePositionX - cueBallCenterX;
