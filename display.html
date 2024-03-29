@@ -50,9 +50,9 @@
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
             <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" />
-            <circle class="ball otherBall" id="otherBall2" />
-            <circle class="ball otherBall" id="otherBall3" />
+            <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" />
+            <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" />
+            <circle class="ball otherBall" id="otherBall3" cx="700" cy="300" />
             <!-- Add other balls and table elements here -->
         </svg>
     </div>
@@ -64,13 +64,9 @@
 
             let isDragging = false;
             let guideLine = null;
-            let initialPositionX = 0;
-            let initialPositionY = 0;
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
-                initialPositionX = event.clientX;
-                initialPositionY = event.clientY;
             });
 
             document.addEventListener('mousemove', function(event) {
@@ -101,8 +97,10 @@
                     }
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
-                    const velocityX = releasePositionX - initialPositionX;
-                    const velocityY = releasePositionY - initialPositionY;
+                    const cueBallCenterX = cueBall.getAttribute('cx');
+                    const cueBallCenterY = cueBall.getAttribute('cy');
+                    const velocityX = releasePositionX - cueBallCenterX;
+                    const velocityY = releasePositionY - cueBallCenterY;
                     console.log('Initial Velocity X:', velocityX);
                     console.log('Initial Velocity Y:', velocityY);
                     // Call function to send initial velocity to server
