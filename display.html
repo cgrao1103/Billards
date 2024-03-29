@@ -23,20 +23,20 @@
         }
         #cueBall {
             r: 10;
+            cx: 100;
+            cy: 200;
         }
         .otherBall {
             r: 10;
+            cx: 700;
         }
         #otherBall1 {
-            cx: 700;
             cy: 100;
         }
         #otherBall2 {
-            cx: 700;
             cy: 200;
         }
         #otherBall3 {
-            cx: 700;
             cy: 300;
         }
         #guideLine {
@@ -49,10 +49,10 @@
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
-            <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" />
-            <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" />
-            <circle class="ball otherBall" id="otherBall3" cx="700" cy="300" />
+            <circle class="ball" id="cueBall" r="10" cx="100" cy="200" />
+            <circle class="ball otherBall" id="otherBall1" r="10" cx="700" cy="100" />
+            <circle class="ball otherBall" id="otherBall2" r="10" cx="700" cy="200" />
+            <circle class="ball otherBall" id="otherBall3" r="10" cx="700" cy="300" />
             <!-- Add other balls and table elements here -->
         </svg>
     </div>
