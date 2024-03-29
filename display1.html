@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Animating the Shot</title>
     <style>
+        /* CSS styles for the pool table */
         #poolTableContainer {
             width: 800px;
             height: 400px;
@@ -17,83 +18,45 @@
             height: 100%;
             background-color: green;
         }
-        .ball {
-            fill: white;
-            cursor: pointer;
-        }
-        #cueBall {
-            r: 10;
-        }
-        .otherBall {
-            r: 10;
-        }
-        #otherBall1 {
-            cx: 700;
-            cy: 100;
-        }
-        #otherBall2 {
-            cx: 700;
-            cy: 200;
-        }
-        #otherBall3 {
-            cx: 700;
-            cy: 300;
-        }
-        #guideLine {
-            stroke: white;
-            stroke-width: 3;
-        }
     </style>
 </head>
 <body>
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-            <!-- Add SVG elements for pool table here -->
-            <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" r="10" />
-            <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall3" cx="700" cy="300" r="10" />
-            <!-- Add other balls and table elements here -->
+            <!-- SVG elements for the pool table -->
+            <circle cx="100" cy="200" r="10" fill="white" /> <!-- Example cue ball -->
         </svg>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
-        $(document).ready(function() {
-            animateShot();
-        });
+        // Function to request the table data from the server
+        function requestTableData(time) {
+            // Mocking the table data for demonstration
+            const svgData = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400">
+                                <!-- SVG elements for the pool table at the given time -->
+                                <circle cx="100" cy="200" r="10" fill="white" /> <!-- Example cue ball -->
+                                <text x="50" y="50" font-size="20" fill="white">Time: ${time.toFixed(1)}</text>
+                            </svg>`;
 
+            // Update the SVG on the webpage with the received data
+            document.getElementById('poolTable').innerHTML = svgData;
+        }
+
+        // Function to animate the shot
         function animateShot() {
             let time = 0.0;
-            let interval = 1000; // milliseconds
-
-            function requestTableData() {
-                // Make an AJAX request to get the table data for the current time
-                $.ajax({
-                    url: 'server-url', // Replace 'server-url' with the actual server endpoint
-                    method: 'GET',
-                    data: { time: time },
-                    success: function(data) {
-                        displayTable(data); // Display the received SVG table data
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Failed to fetch table data:', error);
-                    }
-                });
-            }
-
-            function displayTable(svgData) {
-                $('#poolTable').html(svgData); // Update the SVG content with the received data
-                update(); // Update the time and request the next table data
-            }
-
-            function update() {
-                time += 0.1; // Increment time by 0.1 seconds
-                setTimeout(animateShot, interval); // Schedule the next animation frame
-            }
-
-            requestTableData(); // Initial request to start the animation
+            setInterval(function() {
+                // Request table data corresponding to the current time
+                requestTableData(time);
+                // Increment time for the next request
+                time += 0.1; // Adjust the time interval as needed
+            }, 100); // Adjust the interval as needed
         }
+
+        // Start animating the shot when the document is ready
+        document.addEventListener("DOMContentLoaded", function() {
+            animateShot();
+        });
     </script>
 </body>
 </html>
