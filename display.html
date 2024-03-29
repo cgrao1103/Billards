@@ -18,26 +18,27 @@
             background-color: green;
         }
         .ball {
-            fill: white;
             cursor: pointer;
         }
         #cueBall {
+            fill: white;
             r: 10;
         }
         .otherBall {
+            fill: black;
             r: 10;
         }
         #otherBall1 {
-            cx: 700;
-            cy: 100;
+            cx: 100;
+            cy: 200;
         }
         #otherBall2 {
-            cx: 700;
+            cx: 200;
             cy: 200;
         }
         #otherBall3 {
-            cx: 700;
-            cy: 300;
+            cx: 300;
+            cy: 200;
         }
         #guideLine {
             stroke: white;
@@ -50,69 +51,67 @@
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
             <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" />
-            <circle class="ball otherBall" id="otherBall2" />
-            <circle class="ball otherBall" id="otherBall3" />
+            <circle class="ball otherBall" id="otherBall1" cx="100" cy="200" r="10" />
+            <circle class="ball otherBall" id="otherBall2" cx="200" cy="200" r="10" />
+            <circle class="ball otherBall" id="otherBall3" cx="300" cy="200" r="10" />
             <!-- Add other balls and table elements here -->
         </svg>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-        const poolTable = document.getElementById('poolTable');
-        const cueBall = document.getElementById('cueBall');
-        const otherBalls = document.querySelectorAll('.otherBall');
+            const poolTable = document.getElementById('poolTable');
+            const cueBall = document.getElementById('cueBall');
+            const otherBalls = document.querySelectorAll('.otherBall');
 
-        let isDragging = false;
-        let guideLine = null;
+            let isDragging = false;
+            let guideLine = null;
 
-        cueBall.addEventListener('mousedown', function(event) {
-            isDragging = true;
-        });
+            cueBall.addEventListener('mousedown', function(event) {
+                isDragging = true;
+            });
 
-        document.addEventListener('mousemove', function(event) {
-            if (isDragging) {
-                if (!guideLine) {
-                    guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                    guideLine.setAttribute('id', 'guideLine');
-                    guideLine.setAttribute('stroke', 'white');
-                    guideLine.setAttribute('stroke-width', '3');
-                    poolTable.appendChild(guideLine);
+            document.addEventListener('mousemove', function(event) {
+                if (isDragging) {
+                    if (!guideLine) {
+                        guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                        guideLine.setAttribute('id', 'guideLine');
+                        poolTable.appendChild(guideLine);
+                    }
+                    const cueBallRect = cueBall.getBoundingClientRect();
+                    const cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
+                    const cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
+                    guideLine.setAttribute('x1', cueBallCenterX);
+                    guideLine.setAttribute('y1', cueBallCenterY);
+                    guideLine.setAttribute('x2', event.clientX);
+                    guideLine.setAttribute('y2', event.clientY);
                 }
-                const cueBallRect = cueBall.getBoundingClientRect();
-                const cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
-                const cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
-                guideLine.setAttribute('x1', cueBallCenterX);
-                guideLine.setAttribute('y1', cueBallCenterY);
-                guideLine.setAttribute('x2', event.clientX);
-                guideLine.setAttribute('y2', event.clientY);
-            }
-        });
+            });
 
-        document.addEventListener('mouseup', function(event) {
-            if (isDragging) {
-                isDragging = false;
-                if (guideLine) {
-                    poolTable.removeChild(guideLine);
-                    guideLine = null;
+            document.addEventListener('mouseup', function(event) {
+                if (isDragging) {
+                    isDragging = false;
+                    if (guideLine) {
+                        poolTable.removeChild(guideLine);
+                        guideLine = null;
+                    }
+                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx')) + 10; // Adjust for cue ball radius
+                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy')) + 10; // Adjust for cue ball radius
+                    const releasePositionX = event.clientX;
+                    const releasePositionY = event.clientY;
+                    const velocityX = releasePositionX - cueBallCenterX;
+                    const velocityY = releasePositionY - cueBallCenterY;
+                    console.log('Initial Velocity X:', velocityX);
+                    console.log('Initial Velocity Y:', velocityY);
+                    // Call function to send initial velocity to server
+                    sendInitialVelocityToServer(velocityX, velocityY);
                 }
-                const cueBallCenterX = parseFloat(cueBall.getAttribute('cx')) + 28; // Adjust for cue ball radius
-                const cueBallCenterY = parseFloat(cueBall.getAttribute('cy')) + 28; // Adjust for cue ball radius
-                const releasePositionX = event.clientX;
-                const releasePositionY = event.clientY;
-                const velocityX = releasePositionX - cueBallCenterX;
-                const velocityY = releasePositionY - cueBallCenterY;
-                console.log('Initial Velocity X:', velocityX);
-                console.log('Initial Velocity Y:', velocityY);
-                // Call function to send initial velocity to server
-                sendInitialVelocityToServer(velocityX, velocityY);
-            }
+            });
         });
-    });
 
-    function sendInitialVelocityToServer(velocityX, velocityY) {
-        // Implement sending initial velocity to server
-        console.log('Sending initial velocity to server:', velocityX, velocityY);
-    }
+        function sendInitialVelocityToServer(velocityX, velocityY) {
+            // Implement sending initial velocity to server
+            console.log('Sending initial velocity to server:', velocityX, velocityY);
+        }
     </script>
 </body>
 </html>
