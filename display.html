@@ -6,44 +6,54 @@
     <title>Make a Shot</title>
     <style>
         #poolTableContainer {
-            width: 600px;
-            height: 600px;
+            width: 800px;
+            height: 400px;
             margin: 0 auto;
+            border: 2px solid black;
             position: relative;
         }
         #poolTable {
             width: 100%;
             height: 100%;
+            background-color: green;
         }
         .ball {
+            fill: white;
             cursor: pointer;
         }
-        .otherBall {
-            fill: black;
-        }
         #cueBall {
-            fill: white;
+            r: 10;
+        }
+        .otherBall {
+            r: 10;
+        }
+        #otherBall1 {
+            cx: 700;
+            cy: 100;
+        }
+        #otherBall2 {
+            cx: 700;
+            cy: 200;
+        }
+        #otherBall3 {
+            cx: 700;
+            cy: 300;
+        }
+        #guideLine {
+            stroke: white;
+            stroke-width: 3;
         }
     </style>
 </head>
 <body>
     <div id="poolTableContainer">
-        <svg id="poolTable" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-            <rect width="550" height="550" x="25" y="25" fill="#C0D0C0" />
-            <rect width="600" height="25" x="0" y="25" fill="darkgreen" />
-            <rect width="600" height="25" x="0" y="575" fill="darkgreen" />
-            <rect width="25" height="600" x="0" y="0" fill="darkgreen" />
-            <rect width="25" height="600" x="575" y="0" fill="darkgreen" />
-            <circle class="otherBall" id="otherBall1" cx="75" cy="75" r="25" />
-            <circle class="otherBall" id="otherBall2" cx="75" cy="525" r="25" />
-            <circle class="otherBall" id="otherBall3" cx="75" cy="300" r="25" />
-            <circle class="otherBall" id="otherBall4" cx="525" cy="75" r="25" />
-            <circle class="otherBall" id="otherBall5" cx="525" cy="525" r="25" />
-            <circle class="otherBall" id="otherBall6" cx="525" cy="300" r="25" />
-            <circle class="ball" id="cueBall" cx="300" cy="300" r="28" />
-            <circle class="otherBall" id="otherBall7" cx="225" cy="225" r="20" fill="yellow" />
-            <circle class="otherBall" id="otherBall8" cx="225" cy="375" r="20" fill="blue" />
-            <circle class="otherBall" id="otherBall9" cx="375" cy="300" r="20" fill="red" />
+        <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Add SVG elements for pool table here -->
+            <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
+            <circle class="ball otherBall" id="otherBall1" />
+            <circle class="ball otherBall" id="otherBall2" />
+            <circle class="ball otherBall" id="otherBall3" />
+            <!-- Add other balls and table elements here -->
         </svg>
     </div>
     <script>
@@ -54,9 +64,13 @@
 
             let isDragging = false;
             let guideLine = null;
+            let initialPositionX = 0;
+            let initialPositionY = 0;
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
+                initialPositionX = event.clientX;
+                initialPositionY = event.clientY;
             });
 
             document.addEventListener('mousemove', function(event) {
@@ -87,10 +101,8 @@
                     }
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
-                    const cueBallCenterX = cueBall.getAttribute('cx');
-                    const cueBallCenterY = cueBall.getAttribute('cy');
-                    const velocityX = releasePositionX - cueBallCenterX;
-                    const velocityY = releasePositionY - cueBallCenterY;
+                    const velocityX = releasePositionX - initialPositionX;
+                    const velocityY = releasePositionY - initialPositionY;
                     console.log('Initial Velocity X:', velocityX);
                     console.log('Initial Velocity Y:', velocityY);
                     // Call function to send initial velocity to server
