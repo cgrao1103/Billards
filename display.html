@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pool Table</title>
+<style>
+    #pool-table {
+        position: relative;
+        width: 600px;
+        height: 300px;
+        background-color: green; /* Color of the pool table */
+        border: 2px solid brown; /* Border color */
+        margin: 20px auto; /* Center the table */
+    }
+    #cue-ball {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: white; /* Color of the cue ball */
+        border-radius: 50%; /* Make it round */
+        cursor: pointer;
+    }
+    #line {
+        stroke: black;
+        stroke-width: 3;
+    }
+</style>
+</head>
+<body>
+<div id="pool-table">
+    <div id="cue-ball"></div>
+    <!-- Other elements representing balls on the table can be added here -->
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const cueBall = document.getElementById("cue-ball");
+    let isDragging = false;
+    let line = null;
+
+    // Add event listeners for mouse events
+    cueBall.addEventListener("mousedown", startDrag);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", endDrag);
+
+    function startDrag(event) {
+        isDragging = true;
+        // Create a new SVG line element for visualizing shot direction
+        line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("id", "line");
+        line.setAttribute("x1", cueBall.offsetLeft + 10); // Position of cue ball center
+        line.setAttribute("y1", cueBall.offsetTop + 10);
+        line.setAttribute("x2", event.clientX); // Initial line end position
+        line.setAttribute("y2", event.clientY);
+        document.getElementById("pool-table").appendChild(line);
+    }
+
+    function drag(event) {
+        if (isDragging) {
+            line.setAttribute("x2", event.clientX); // Update line end position
+            line.setAttribute("y2", event.clientY);
+        }
+    }
+
+    function endDrag(event) {
+        if (isDragging) {
+            isDragging = false;
+            const releaseX = event.clientX;
+            const releaseY = event.clientY;
+            const cueBallX = cueBall.offsetLeft + 10; // Center of cue ball
+            const cueBallY = cueBall.offsetTop + 10;
+            const deltaX = releaseX - cueBallX;
+            const deltaY = releaseY - cueBallY;
+            const velocityX = deltaX * 0.1; // Adjust this factor for velocity calculation
+            const velocityY = deltaY * 0.1;
+            // Perform calculations for acceleration and shot data
+            // Send shot data to server using AJAX and add to database
+            // ...
+            document.getElementById("pool-table").removeChild(line); // Remove the line
+        }
+    }
+});
+</script>
+</body>
+</html>
