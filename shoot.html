@@ -58,6 +58,8 @@
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
+                inintialX=event.clientX;
+                inintialY=event.clientY;
             });
 
             document.addEventListener('mousemove', function(event) {
@@ -86,8 +88,13 @@
                         poolTable.removeChild(guideLine);
                         guideLine = null;
                     }
-                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
-                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
+
+                    var cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
+                    var cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
+
+
+                    //const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
+                    //const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
                     const velocityX = releasePositionX - cueBallCenterX;
