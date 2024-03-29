@@ -1,29 +1,113 @@
-<html>
-  <head>
-    <title> Shoot! </title>
-  </head>
-  <body>
-    <form action="display.html" method="post">
-      <h3> Still Ball </h3>
-        <label for="sb_number">Number (1-15):</label>
-        <input type="text" id="sb_number" name="sb_number" size="2" />
-        <label for="sb_x">X (28.5-1321.5):</label>
-        <input type="text" id="sb_x" name="sb_x" size="6" />
-        <label for="sb_y">Y (28.5-2671.5):</label>
-        <input type="text" id="sb_y" name="sb_y" size="6" />
-      <h3> Rolling Ball </h3>
-        <label for="rb_number">Number:</label>
-        <input type="text" id="rb_number" name="rb_number" size="2"
-	       value="0" readonly />
-        <label for="rb_x">X (28.5-1321.5):</label>
-        <input type="text" id="rb_x" name="rb_x" size="6" />
-        <label for="rb_y">Y (28.5-2671.5):</label>
-        <input type="text" id="rb_y" name="rb_y" size="6" />
-        <label for="rb_dx">&Delta;X:</label>
-        <input type="text" id="rb_dx" name="rb_dx" size="6" />
-        <label for="rb_dy">&Delta;Y:</label>
-        <input type="text" id="rb_dy" name="rb_dy" size="6" />
-      <h3> <input type="submit" value="Shoot!" /> </h3>
-    </form>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Shot</title>
+    <style>
+        #poolTableContainer {
+            width: 800px;
+            height: 400px;
+            margin: 0 auto;
+            border: 2px solid black;
+            position: relative;
+        }
+        #poolTable {
+            width: 100%;
+            height: 100%;
+        }
+        .ball {
+            fill: white;
+            cursor: pointer;
+        }
+        .otherBall {
+            fill: black;
+            cursor: pointer;
+        }
+        #cueBall {
+            r: 10;
+            fill: white;
+        }
+        #guideLine {
+            stroke: white;
+            stroke-width: 3;
+        }
+    </style>
+</head>
+<body>
+    <div id="poolTableContainer">
+        <svg id="poolTable" width="700" height="1375" viewBox="-25 -25 1400 2750" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="1350" height="2700" x="0" y="0" fill="#C0D0C0" /> 
+            <rect width="1400" height="25" x="-25" y="0" fill="darkgreen" />
+            <rect width="1400" height="25" x="-25" y="2700" fill="darkgreen" />
+            <rect width="25" height="2750" x="0" y="-25" fill="darkgreen" />
+            <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
+            <circle cx="0" cy="0" r="114" fill="black" />
+            <circle cx="0" cy="1350" r="114" fill="black" />
+            <circle cx="0" cy="2700" r="114" fill="black" />
+            <circle cx="1350" cy="0" r="114" fill="black" />
+            <circle cx="1350" cy="1350" r="114" fill="black" />
+            <circle cx="1350" cy="2700" r="114" fill="black" />
+            <circle cx="634" cy="634" r="28" fill="YELLOW" />
+            <circle cx="675" cy="2025" r="28" fill="WHITE" />
+        </svg>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const poolTable = document.getElementById('poolTable');
+            const cueBall = document.getElementById('cueBall');
+            const otherBalls = document.querySelectorAll('.otherBall');
+
+            let isDragging = false;
+            let guideLine = null;
+
+            cueBall.addEventListener('mousedown', function(event) {
+                isDragging = true;
+            });
+
+            document.addEventListener('mousemove', function(event) {
+                if (isDragging) {
+                    if (!guideLine) {
+                        guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                        guideLine.setAttribute('id', 'guideLine');
+                        guideLine.setAttribute('stroke', 'white');
+                        guideLine.setAttribute('stroke-width', '3');
+                        poolTable.appendChild(guideLine);
+                    }
+                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
+                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
+                    guideLine.setAttribute('x1', cueBallCenterX);
+                    guideLine.setAttribute('y1', cueBallCenterY);
+                    guideLine.setAttribute('x2', event.clientX);
+                    guideLine.setAttribute('y2', event.clientY);
+                }
+            });
+
+            document.addEventListener('mouseup', function(event) {
+                if (isDragging) {
+                    isDragging = false;
+                    if (guideLine) {
+                        poolTable.removeChild(guideLine);
+                        guideLine = null;
+                    }
+                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
+                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
+                    const releasePositionX = event.clientX;
+                    const releasePositionY = event.clientY;
+                    const velocityX = releasePositionX - cueBallCenterX;
+                    const velocityY = releasePositionY - cueBallCenterY;
+                    console.log('Initial Velocity X:', velocityX);
+                    console.log('Initial Velocity Y:', velocityY);
+                    // Call function to send initial velocity to server
+                    sendInitialVelocityToServer(velocityX, velocityY);
+                }
+            });
+        });
+
+        function sendInitialVelocityToServer(velocityX, velocityY) {
+            // Implement sending initial velocity to server
+            console.log('Sending initial velocity to server:', velocityX, velocityY);
+        }
+    </script>
+</body>
 </html>

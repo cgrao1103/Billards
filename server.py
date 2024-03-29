@@ -3,16 +3,23 @@ import math
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
 import Physics
+from Physics import Game
+
+
+
+shoot_game = Physics.Game(gameName="Poll", player1Name="Kit", player2Name="Kat")
 
 # Define the necessary classes and functions
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        
         parsed_path = self.path.split("?")[0]
         if parsed_path == '/':
             self.send_response(302)
             self.send_header('Location', '/shoot.html')
             self.end_headers()
+                
         elif parsed_path == "/shoot.html":
             # Serve shoot.html
             self._serve_html_file("shoot.html")
@@ -63,6 +70,20 @@ class MyHandler(BaseHTTPRequestHandler):
 
         # Generate HTML content
         html_content = generate_html_content(form_data, table)
+        
+        if self.path == '/send_velocity':
+        # Extract velocity data from the parsed POST data
+            velocity_x = float(parsed_post_data['velocityX'][0])
+            velocity_y = float(parsed_post_data['velocityY'][0])
+
+        # Process the velocity data as needed
+            self.process_velocity(velocity_x, velocity_y)
+
+        # Send a simple response indicating success
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b"Initial velocity received and processed successfully.")
 
         # Send HTML response
         self.send_response(200)
@@ -95,6 +116,13 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b"404 Not Found")
+            
+    def process_velocity(self,velocity_x, velocity_y):
+    # Process the received velocity data here
+        print('Received initial velocity X:', velocity_x)
+        print('Received initial velocity Y:', velocity_y)
+        with open('velocity_data.txt', 'a') as file:
+            file.write(f"Velocity X: {velocity_x}, Velocity Y: {velocity_y}\n")
 
 def compute_acceleration(form_data):
     # Extract still ball and rolling ball data from form_data

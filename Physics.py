@@ -707,8 +707,6 @@ class Game:
                 self.database.recordTableShot(ntableID,shotID)
                 
                 #return shotID
-                
-                
             
                 #self.database.conn.commit()
             table = newtable
