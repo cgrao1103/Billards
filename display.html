@@ -17,9 +17,12 @@
             height: 100%;
             background-color: green;
         }
-        #cueBall {
+        .ball {
             fill: white;
             cursor: pointer;
+        }
+        #cueBall {
+            r: 10;
         }
         #guideLine {
             stroke: white;
@@ -31,18 +34,14 @@
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
-            <!-- Example: <circle id="cueBall" cx="50" cy="50" r="10" /> -->
+            <circle class="ball" id="cueBall" cx="50" cy="50" r="10" />
+            <!-- Add other balls and table elements here -->
         </svg>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const poolTable = document.getElementById('poolTable');
-            const cueBall = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-            cueBall.setAttribute('id', 'cueBall');
-            cueBall.setAttribute('cx', '50');
-            cueBall.setAttribute('cy', '50');
-            cueBall.setAttribute('r', '10');
-            poolTable.appendChild(cueBall);
+            const cueBall = document.getElementById('cueBall');
 
             let isDragging = false;
             let guideLine = null;
