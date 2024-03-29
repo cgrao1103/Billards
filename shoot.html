@@ -24,21 +24,6 @@
         #cueBall {
             r: 10;
         }
-        .otherBall {
-            r: 10;
-        }
-        #otherBall1 {
-            cx: 700;
-            cy: 100;
-        }
-        #otherBall2 {
-            cx: 700;
-            cy: 200;
-        }
-        #otherBall3 {
-            cx: 700;
-            cy: 300;
-        }
         #guideLine {
             stroke: white;
             stroke-width: 3;
@@ -49,18 +34,25 @@
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
-            <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" r="10" />
-            <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" r="10" />
-            <circle class="ball otherBall" id="otherBall3" cx="700" cy="300" r="10" />
-            <!-- Add other balls and table elements here -->
+            <rect width="1350" height="2700" x="0" y="0" fill="#C0D0C0" /> 
+            <rect width="1400" height="25" x="-25" y="0" fill="darkgreen" />
+            <rect width="1400" height="25" x="-25" y="2700" fill="darkgreen" />
+            <rect width="25" height="2750" x="0" y="-25" fill="darkgreen" />
+            <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
+            <circle cx="0" cy="0" r="114" fill="black" />
+            <circle cx="0" cy="1350" r="114" fill="black" />
+            <circle cx="0" cy="2700" r="114" fill="black" />
+            <circle cx="1350" cy="0" r="114" fill="black" />
+            <circle cx="1350" cy="1350" r="114" fill="black" />
+            <circle cx="1350" cy="2700" r="114" fill="black" />
+            <circle cx="634" cy="634" r="28" fill="YELLOW" />
+            <circle cx="675" cy="2025" r="28" fill="WHITE" />
         </svg>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const poolTable = document.getElementById('poolTable');
             const cueBall = document.getElementById('cueBall');
-            const otherBalls = document.querySelectorAll('.otherBall');
 
             let isDragging = false;
             let guideLine = null;
