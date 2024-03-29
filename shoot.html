@@ -54,23 +54,28 @@
             const poolTable = document.getElementById('poolTable');
             const cueBall = document.getElementById('cueBall');
             let isDragging = false;
-            const guideLine = document-getElementById ("guide-line");
+            const guideLine = document.getElementById("guideLine"); // Fix here
             var initialX, initialY;
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
-                inintialX=event.clientX;
-                inintialY=event.clientY;
+                initialX = event.clientX;
+                initialY = event.clientY;
             });
 
             document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
-                    
-                    
+                    if (!guideLine) {
+                        guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                        guideLine.setAttribute('id', 'guideLine');
+                        guideLine.setAttribute('stroke', 'white');
+                        guideLine.setAttribute('stroke-width', '3');
+                        poolTable.appendChild(guideLine);
+                    }
                     const rect = poolTable.getBoundingClientRect();
 
-                    const mouseX = event.clientX - intialX + parseFloat(cueBall.getAttribute('cx'));
-                    const mouseY = event.clientY - intialY + parseFloat(cueBall.getAttribute('cy'));
+                    const mouseX = event.clientX - initialX + parseFloat(cueBall.getAttribute('cx'));
+                    const mouseY = event.clientY - initialY + parseFloat(cueBall.getAttribute('cy'));
 
                     guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
                     guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
@@ -83,15 +88,10 @@
                 if (isDragging) {
                     isDragging = false;
 
-                    const rect = cueBall.getBoundingClientRect();
-                    
-
+                    const cueBallRect = cueBall.getBoundingClientRect();
                     var cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
                     var cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
 
-
-                    //const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
-                    //const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
                     const velocityX = releasePositionX - cueBallCenterX;
