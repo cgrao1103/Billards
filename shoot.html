@@ -26,7 +26,7 @@
         }
         #guideLine {
             stroke: white;
-            stroke-width: 3;
+            stroke-width: 6; /* Adjust thickness as needed */
         }
     </style>
 </head>
@@ -66,7 +66,7 @@
                         guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                         guideLine.setAttribute('id', 'guideLine');
                         guideLine.setAttribute('stroke', 'white');
-                        guideLine.setAttribute('stroke-width', '3');
+                        guideLine.setAttribute('stroke-width', '6'); // Thick line
                         poolTable.appendChild(guideLine);
                     }
                     const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
