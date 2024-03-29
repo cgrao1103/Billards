@@ -27,53 +27,9 @@
             cx: 634;
             cy: 634;
         }
-        #otherBall1 {
-            fill: black;
-            r: 114;
-            cx: 0;
-            cy: 0;
-        }
-        #otherBall2 {
-            fill: black;
-            r: 114;
-            cx: 0;
-            cy: 1350;
-        }
-        #otherBall3 {
-            fill: black;
-            r: 114;
-            cx: 0;
-            cy: 2700;
-        }
-        #otherBall4 {
-            fill: black;
-            r: 114;
-            cx: 1350;
-            cy: 0;
-        }
-        #otherBall5 {
-            fill: black;
-            r: 114;
-            cx: 1350;
-            cy: 1350;
-        }
-        #otherBall6 {
-            fill: black;
-            r: 114;
-            cx: 1350;
-            cy: 2700;
-        }
-        #otherBall7 {
-            fill: yellow;
-            r: 28;
-            cx: 634;
-            cy: 634;
-        }
-        #otherBall8 {
-            fill: white;
-            r: 28;
-            cx: 675;
-            cy: 2025;
+        #guideLine {
+            stroke: white;
+            stroke-width: 5;
         }
     </style>
 </head>
@@ -88,22 +44,12 @@
             <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
             <!-- Cue ball -->
             <circle class="ball" id="cueBall" cx="634" cy="634" r="28" />
-            <!-- Other balls -->
-            <circle class="otherBall" id="otherBall1" cx="0" cy="0" r="114" />
-            <circle class="otherBall" id="otherBall2" cx="0" cy="1350" r="114" />
-            <circle class="otherBall" id="otherBall3" cx="0" cy="2700" r="114" />
-            <circle class="otherBall" id="otherBall4" cx="1350" cy="0" r="114" />
-            <circle class="otherBall" id="otherBall5" cx="1350" cy="1350" r="114" />
-            <circle class="otherBall" id="otherBall6" cx="1350" cy="2700" r="114" />
-            <circle class="otherBall" id="otherBall7" cx="634" cy="634" r="28" fill="yellow" />
-            <circle class="otherBall" id="otherBall8" cx="675" cy="2025" r="28" fill="white" />
         </svg>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const cueBall = document.getElementById('cueBall');
             const poolTable = document.getElementById('poolTable');
-
             let isDragging = false;
             let guideLine = null;
 
@@ -116,8 +62,6 @@
                     if (!guideLine) {
                         guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                         guideLine.setAttribute('id', 'guideLine');
-                        guideLine.setAttribute('stroke', 'white');
-                        guideLine.setAttribute('stroke-width', '5');
                         poolTable.appendChild(guideLine);
                     }
                     const cueBallRect = cueBall.getBoundingClientRect();
