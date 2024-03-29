@@ -18,13 +18,21 @@
             height: 100%;
             background-color: green;
         }
+        .cueBall {
+            fill: white;
+            cursor: pointer;
+        }
+        #guideLine {
+            stroke: white;
+            stroke-width: 3;
+        }
     </style>
 </head>
 <body>
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- SVG elements for the pool table -->
-            <circle cx="100" cy="200" r="10" fill="white" /> <!-- Example cue ball -->
+            <circle class="cueBall" cx="100" cy="200" r="10" fill="white" /> <!-- Example cue ball -->
         </svg>
     </div>
 
@@ -34,7 +42,7 @@
             // Mocking the table data for demonstration
             const svgData = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400">
                                 <!-- SVG elements for the pool table at the given time -->
-                                <circle cx="100" cy="200" r="10" fill="white" /> <!-- Example cue ball -->
+                                <circle class="cueBall" cx="100" cy="200" r="10" fill="white" /> <!-- Example cue ball -->
                                 <text x="50" y="50" font-size="20" fill="white">Time: ${time.toFixed(1)}</text>
                             </svg>`;
 
