@@ -65,13 +65,7 @@
 
             document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
-                    if (!guideLine) {
-                        guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                        guideLine.setAttribute('id', 'guideLine');
-                        guideLine.setAttribute('stroke', 'white');
-                        guideLine.setAttribute('stroke-width', '3');
-                        poolTable.appendChild(guideLine);
-                    }
+                   
                     const rect = poolTable.getBoundingClientRect();
 
                     const mouseX = event.clientX - initialX + parseFloat(cueBall.getAttribute('cx'));
@@ -89,8 +83,8 @@
                     isDragging = false;
 
                     const cueBallRect = cueBall.getBoundingClientRect();
-                    var cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
-                    var cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
+                    const cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
+                    const cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
 
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
