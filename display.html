@@ -95,10 +95,10 @@
                     poolTable.removeChild(guideLine);
                     guideLine = null;
                 }
+                const cueBallCenterX = parseFloat(cueBall.getAttribute('cx')) + 28; // Adjust for cue ball radius
+                const cueBallCenterY = parseFloat(cueBall.getAttribute('cy')) + 28; // Adjust for cue ball radius
                 const releasePositionX = event.clientX;
                 const releasePositionY = event.clientY;
-                const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
-                const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
                 const velocityX = releasePositionX - cueBallCenterX;
                 const velocityY = releasePositionY - cueBallCenterY;
                 console.log('Initial Velocity X:', velocityX);
