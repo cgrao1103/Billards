@@ -9,6 +9,8 @@
             width: 800px;
             height: 400px;
             margin: 0 auto;
+            border: 2px solid black;
+            position: relative;
         }
         #poolTable {
             width: 100%;
@@ -17,6 +19,7 @@
         }
         #cueBall {
             fill: white;
+            cursor: pointer;
         }
         #guideLine {
             stroke: white;
@@ -28,7 +31,7 @@
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
             <!-- Add SVG elements for pool table here -->
-            <circle id="cueBall" cx="50" cy="50" r="10" /> 
+            <!-- Example: <circle id="cueBall" cx="50" cy="50" r="10" /> -->
         </svg>
     </div>
     <script>
@@ -44,29 +47,36 @@
             let isDragging = false;
             let guideLine = null;
 
-            poolTable.addEventListener('mousedown', function(event) {
+            cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
+                const cueBallRect = cueBall.getBoundingClientRect();
+                const offsetX = event.clientX - cueBallRect.left;
+                const offsetY = event.clientY - cueBallRect.top;
                 guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
                 guideLine.setAttribute('id', 'guideLine');
-                guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
-                guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
-                guideLine.setAttribute('x2', event.offsetX);
-                guideLine.setAttribute('y2', event.offsetY);
+                guideLine.setAttribute('x1', offsetX);
+                guideLine.setAttribute('y1', offsetY);
+                guideLine.setAttribute('x2', offsetX);
+                guideLine.setAttribute('y2', offsetY);
                 poolTable.appendChild(guideLine);
             });
 
-            poolTable.addEventListener('mousemove', function(event) {
+            document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
-                    guideLine.setAttribute('x2', event.offsetX);
-                    guideLine.setAttribute('y2', event.offsetY);
+                    const poolTableRect = poolTable.getBoundingClientRect();
+                    const offsetX = event.clientX - poolTableRect.left;
+                    const offsetY = event.clientY - poolTableRect.top;
+                    guideLine.setAttribute('x2', offsetX);
+                    guideLine.setAttribute('y2', offsetY);
                 }
             });
 
-            poolTable.addEventListener('mouseup', function(event) {
+            document.addEventListener('mouseup', function(event) {
                 if (isDragging) {
                     isDragging = false;
-                    const releaseX = event.offsetX;
-                    const releaseY = event.offsetY;
+                    const poolTableRect = poolTable.getBoundingClientRect();
+                    const releaseX = event.clientX - poolTableRect.left;
+                    const releaseY = event.clientY - poolTableRect.top;
                     const cueBallX = parseFloat(cueBall.getAttribute('cx'));
                     const cueBallY = parseFloat(cueBall.getAttribute('cy'));
                     const initialVelocityX = releaseX - cueBallX;
