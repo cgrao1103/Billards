@@ -78,9 +78,8 @@
                         guideLine.setAttribute('stroke-width', '3');
                         poolTable.appendChild(guideLine);
                     }
-                    const cueBallRect = cueBall.getBoundingClientRect();
-                    const cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
-                    const cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
+                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
+                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
                     guideLine.setAttribute('x1', cueBallCenterX);
                     guideLine.setAttribute('y1', cueBallCenterY);
                     guideLine.setAttribute('x2', event.clientX);
@@ -95,8 +94,8 @@
                         poolTable.removeChild(guideLine);
                         guideLine = null;
                     }
-                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx')); // Adjust for cue ball radius
-                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy')); // Adjust for cue ball radius
+                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
+                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
                     const velocityX = releasePositionX - cueBallCenterX;
