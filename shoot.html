@@ -54,26 +54,32 @@
             const poolTable = document.getElementById('poolTable');
             const cueBall = document.getElementById('cueBall');
             let isDragging = false;
-            let guideLine = document.getElementById("guideLine");
+            let guideLine = null;
             var initialX, initialY;
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
                 initialX = event.clientX;
                 initialY = event.clientY;
+                if (!guideLine) {
+                    guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                    guideLine.setAttribute('id', 'guideLine');
+                    guideLine.setAttribute('stroke', 'white');
+                    guideLine.setAttribute('stroke-width', '3');
+                    poolTable.appendChild(guideLine);
+                }
+                const cueBallRect = cueBall.getBoundingClientRect();
+                guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
+                guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
+                guideLine.setAttribute('x2', cueBall.getAttribute('cx'));
+                guideLine.setAttribute('y2', cueBall.getAttribute('cy'));
             });
 
             document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
                     const cueBallRect = cueBall.getBoundingClientRect();
-                   
-                    //const rect = poolTable.getBoundingClientRect();
-
                     const mouseX = event.clientX - initialX + parseFloat(cueBall.getAttribute('cx'));
                     const mouseY = event.clientY - initialY + parseFloat(cueBall.getAttribute('cy'));
-
-                    guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
-                    guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
                     guideLine.setAttribute('x2', mouseX);
                     guideLine.setAttribute('y2', mouseY);
                 }
@@ -82,16 +88,11 @@
             document.addEventListener('mouseup', function(event) {
                 if (isDragging) {
                     isDragging = false;
-                    if (guideLine) {
-                        // Remove the guideLine element
-                        poolTable.removeChild(guideLine);
-                        guideLine = null;
-                    }
-
+                    poolTable.removeChild(guideLine);
+                    guideLine = null;
                     const cueBallRect = cueBall.getBoundingClientRect();
                     const cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
                     const cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
-
                     const releasePositionX = event.clientX;
                     const releasePositionY = event.clientY;
                     const velocityX = releasePositionX - cueBallCenterX;
