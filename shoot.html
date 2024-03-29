@@ -54,7 +54,8 @@
             const poolTable = document.getElementById('poolTable');
             const cueBall = document.getElementById('cueBall');
             let isDragging = false;
-            let guideLine = null;
+            const guideLine = document-getElementById ("guide-line");
+            var initialX, initialY;
 
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
@@ -64,16 +65,13 @@
 
             document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
-                    if (!guideLine) {
-                        guideLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-                        guideLine.setAttribute('id', 'guideLine');
-                        guideLine.setAttribute('stroke', 'white');
-                        guideLine.setAttribute('stroke-width', '3');
-                        poolTable.appendChild(guideLine);
-                    }
+                    
+                    
                     const rect = poolTable.getBoundingClientRect();
-                    const mouseX = event.clientX - rect.left;
-                    const mouseY = event.clientY - rect.top;
+
+                    const mouseX = event.clientX - intialX + parseFloat(cueBall.getAttribute('cx'));
+                    const mouseY = event.clientY - intialY + parseFloat(cueBall.getAttribute('cy'));
+
                     guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
                     guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
                     guideLine.setAttribute('x2', mouseX);
@@ -84,10 +82,9 @@
             document.addEventListener('mouseup', function(event) {
                 if (isDragging) {
                     isDragging = false;
-                    if (guideLine) {
-                        poolTable.removeChild(guideLine);
-                        guideLine = null;
-                    }
+
+                    const rect = cueBall.getBoundingClientRect();
+                    
 
                     var cueBallCenterX = cueBallRect.left + cueBallRect.width / 2;
                     var cueBallCenterY = cueBallRect.top + cueBallRect.height / 2;
