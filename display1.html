@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shot Animation</title>
+    <title>Animating the Shot</title>
     <style>
         #poolTableContainer {
             width: 800px;
@@ -27,12 +27,28 @@
         .otherBall {
             r: 10;
         }
+        #otherBall1 {
+            cx: 700;
+            cy: 100;
+        }
+        #otherBall2 {
+            cx: 700;
+            cy: 200;
+        }
+        #otherBall3 {
+            cx: 700;
+            cy: 300;
+        }
+        #guideLine {
+            stroke: white;
+            stroke-width: 3;
+        }
     </style>
 </head>
 <body>
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-            <!-- Initial SVG elements for pool table here -->
+            <!-- Add SVG elements for pool table here -->
             <circle class="ball" id="cueBall" cx="100" cy="200" r="10" />
             <circle class="ball otherBall" id="otherBall1" cx="700" cy="100" r="10" />
             <circle class="ball otherBall" id="otherBall2" cx="700" cy="200" r="10" />
@@ -41,50 +57,43 @@
         </svg>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
-        // Function to request table data from the server
-        function requestTableData(time) {
-            // Make an AJAX request to the server to get SVG data for the table at the specified time
-            // Replace '/get_table_data' with the actual endpoint on your server
-            $.ajax({
-                url: '/get_table_data',
-                method: 'GET',
-                data: { time: time },
-                success: function(response) {
-                    // Update the SVG displayed on the webpage with the received data
-                    $('#poolTable').html(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching table data:', error);
-                }
-            });
-        }
-
-        // Function to continuously update the table data and animate the shot in real-time
-        function animateShot() {
-            let startTime = performance.now(); // Get the current time in milliseconds
-
-            // Define a function to be called on each animation frame
-            function update() {
-                // Calculate the elapsed time since the animation started
-                let currentTime = performance.now();
-                let elapsedTime = (currentTime - startTime) / 1000; // Convert milliseconds to seconds
-
-                // Request table data corresponding to the current time
-                requestTableData(elapsedTime);
-
-                // Continue animating the shot by calling update function on the next animation frame
-                requestAnimationFrame(update);
-            }
-
-            // Start the animation by calling the update function
-            update();
-        }
-
-        // Call the animateShot function when the DOM content is loaded
-        document.addEventListener("DOMContentLoaded", function() {
+        $(document).ready(function() {
             animateShot();
         });
+
+        function animateShot() {
+            let time = 0.0;
+            let interval = 1000; // milliseconds
+
+            function requestTableData() {
+                // Make an AJAX request to get the table data for the current time
+                $.ajax({
+                    url: 'server-url', // Replace 'server-url' with the actual server endpoint
+                    method: 'GET',
+                    data: { time: time },
+                    success: function(data) {
+                        displayTable(data); // Display the received SVG table data
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Failed to fetch table data:', error);
+                    }
+                });
+            }
+
+            function displayTable(svgData) {
+                $('#poolTable').html(svgData); // Update the SVG content with the received data
+                update(); // Update the time and request the next table data
+            }
+
+            function update() {
+                time += 0.1; // Increment time by 0.1 seconds
+                setTimeout(animateShot, interval); // Schedule the next animation frame
+            }
+
+            requestTableData(); // Initial request to start the animation
+        }
     </script>
 </body>
 </html>
