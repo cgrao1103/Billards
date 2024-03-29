@@ -6,14 +6,15 @@
     <title>Make a Shot</title>
     <style>
         #poolTableContainer {
-            width: 700px;
-            height: 1375px;
-            margin: 0 auto;
-            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         #poolTable {
-            width: 100%;
-            height: 100%;
+            width: 80%;
+            height: 80%;
         }
         .ball {
             cursor: pointer;
@@ -24,36 +25,28 @@
         #cueBall {
             fill: white;
         }
-        #otherBall7 {
-            fill: yellow;
-        }
-        #otherBall8 {
-            fill: blue;
-        }
-        #otherBall9 {
-            fill: red;
-        }
         #guideLine {
             stroke: white;
-            stroke-width: 3;
+            stroke-width: 5;
         }
     </style>
 </head>
 <body>
     <div id="poolTableContainer">
         <svg id="poolTable" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-            <rect width="800" height="400" fill="#006400" /> <!-- Green felt background -->
-            <rect width="700" height="350" x="50" y="25" fill="#C0D0C0" /> <!-- Pool table surface -->
-            <circle class="otherBall" id="otherBall1" cx="100" cy="200" r="18" /> <!-- Other balls -->
-            <circle class="otherBall" id="otherBall2" cx="125" cy="150" r="18" />
-            <circle class="otherBall" id="otherBall3" cx="125" cy="250" r="18" />
-            <circle class="otherBall" id="otherBall4" cx="150" cy="100" r="18" />
-            <circle class="otherBall" id="otherBall5" cx="150" cy="200" r="18" />
-            <circle class="otherBall" id="otherBall6" cx="150" cy="300" r="18" />
-            <circle class="ball" id="cueBall" cx="400" cy="200" r="20" /> <!-- Cue ball -->
-            <circle class="otherBall" id="otherBall7" cx="725" cy="75" r="18" /> <!-- Other balls -->
-            <circle class="otherBall" id="otherBall8" cx="725" cy="200" r="18" />
-            <circle class="otherBall" id="otherBall9" cx="725" cy="325" r="18" />
+            <!-- Pool table background -->
+            <rect width="800" height="400" fill="#006400" />
+            <!-- Pool table surface -->
+            <rect width="700" height="350" x="50" y="25" fill="#C0D0C0" />
+            <!-- Cue ball -->
+            <circle class="ball" id="cueBall" cx="100" cy="200" r="20" />
+            <!-- Other balls -->
+            <circle class="otherBall" id="otherBall1" cx="700" cy="200" r="18" />
+            <circle class="otherBall" id="otherBall2" cx="750" cy="175" r="18" />
+            <circle class="otherBall" id="otherBall3" cx="750" cy="225" r="18" />
+            <circle class="otherBall" id="otherBall4" cx="800" cy="150" r="18" />
+            <circle class="otherBall" id="otherBall5" cx="800" cy="200" r="18" />
+            <circle class="otherBall" id="otherBall6" cx="800" cy="250" r="18" />
         </svg>
     </div>
     <script>
