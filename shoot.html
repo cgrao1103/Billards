@@ -69,12 +69,13 @@
                         guideLine.setAttribute('stroke-width', '3');
                         poolTable.appendChild(guideLine);
                     }
-                    const cueBallCenterX = parseFloat(cueBall.getAttribute('cx'));
-                    const cueBallCenterY = parseFloat(cueBall.getAttribute('cy'));
-                    guideLine.setAttribute('x1', cueBallCenterX);
-                    guideLine.setAttribute('y1', cueBallCenterY);
-                    guideLine.setAttribute('x2', event.clientX);
-                    guideLine.setAttribute('y2', event.clientY);
+                    const rect = poolTable.getBoundingClientRect();
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+                    guideLine.setAttribute('x1', cueBall.getAttribute('cx'));
+                    guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
+                    guideLine.setAttribute('x2', mouseX);
+                    guideLine.setAttribute('y2', mouseY);
                 }
             });
 
