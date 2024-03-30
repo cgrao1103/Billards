@@ -2,6 +2,8 @@ import sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
 import json
+import xml.etree.ElementTree as ET
+import Physics
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -35,6 +37,24 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(b"Initial velocity received and processed successfully.")
+            
+            svg_data = parsed_post_data.get('svg', '')    
+            root = ET.fromstring(svg_data)
+            for child in root:
+                if child.tag.endswith('circle'):
+                    cx = child.attrib.get('cx', '')
+                    cy = child.attrib.get('cy', '')
+                    r = child.attrib.get('r', '')
+                    fill = child.attrib.get('fill', '')
+                    if r < 30:
+                        ball_number = Physics.BALL_COLOURS.index(fill)
+                        table += Physics.StillBall(ball_number,Physics.Coordinate(cx,cy))
+            
+            game = Physics.Game()
+            game.shoot(self,table, velocity_x, velocity_y)
+                    
+                    
+                   
         else:
             self.send_response(404)
             self.end_headers()
