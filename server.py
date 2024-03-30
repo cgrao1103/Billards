@@ -35,11 +35,13 @@ class MyHandler(BaseHTTPRequestHandler):
             self.process_velocity(velocity_x, velocity_y)
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
+            self.send_header('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
             self.end_headers()
             self.wfile.write(b"Initial velocity received and processed successfully.")
             
             svg_data = parsed_post_data.get('svg', '')    
             root = ET.fromstring(svg_data)
+            table = []  # Assuming this is a list to store the table balls
             for child in root:
                 if child.tag.endswith('circle'):
                     cx = child.attrib.get('cx', '')
@@ -48,13 +50,11 @@ class MyHandler(BaseHTTPRequestHandler):
                     fill = child.attrib.get('fill', '')
                     if r < 30:
                         ball_number = Physics.BALL_COLOURS.index(fill)
-                        table += Physics.StillBall(ball_number,Physics.Coordinate(cx,cy))
+                        table.append(Physics.StillBall(ball_number, Physics.Coordinate(cx, cy)))
             
             game = Physics.Game()
-            game.shoot(self,table, velocity_x, velocity_y)
+            game.shoot(table, velocity_x, velocity_y)
                     
-                    
-                   
         else:
             self.send_response(404)
             self.end_headers()
