@@ -41,13 +41,15 @@
             r: 40; /* Increased radius */
         }
 
-        .otherBall {
-            r: 40; /* Increased radius */
-        }
-
         #guideLine {
             stroke: white;
             stroke-width: 6; /* Increased stroke width */
+        }
+
+        .otherBalls {
+            fill: none;
+            stroke-width: 2;
+            stroke: #000;
         }
     </style>
 </head>
@@ -59,21 +61,23 @@
             <rect width="1350" height="25" x="-25" y="2700" fill="darkgreen" />
             <rect width="25" height="2750" x="0" y="-25" fill="darkgreen" />
             <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
-            <circle class="ball" id="cueBall" cx="675" cy="2025" r="40" fill="WHITE" /> <!-- Cue ball -->
-            <circle class="otherBall" cx="675" cy="2025" r="40" fill="YELLOW" /> <!-- Yellow ball -->
-            <circle class="otherBall" cx="900" cy="2025" r="40" fill="RED" /> <!-- Red ball -->
-            <circle class="otherBall" cx="975" cy="1940" r="40" fill="LIGHTBLUE" /> <!-- Light blue ball -->
-            <circle class="otherBall" cx="975" cy="2110" r="40" fill="PINK" /> <!-- Pink ball -->
-            <circle class="otherBall" cx="1050" cy="1865" r="40" fill="ORANGE" /> <!-- Orange ball -->
-            <circle class="otherBall" cx="1050" cy="2025" r="40" fill="LIGHTGREEN" /> <!-- Light green ball -->
-            <circle class="otherBall" cx="1050" cy="2185" r="40" fill="PURPLE" /> <!-- Purple ball -->
-            <circle class="otherBall" cx="1125" cy="1790" r="40" fill="BROWN" /> <!-- Brown ball -->
-            <circle class="otherBall" cx="1125" cy="1940" r="40" fill="DARKBLUE" /> <!-- Dark blue ball -->
-            <circle class="otherBall" cx="1125" cy="2110" r="40" fill="LIGHTBROWN" /> <!-- Light brown ball -->
-            <circle class="otherBall" cx="1125" cy="2260" r="40" fill="DARKGREEN" /> <!-- Dark green ball -->
-            <circle class="otherBall" cx="1200" cy="1715" r="40" fill="GRAY" /> <!-- Gray ball -->
-            <circle class="otherBall" cx="1200" cy="1865" r="40" fill="DARKORANGE" /> <!-- Dark orange ball -->
-            <circle class="otherBall" cx="1200" cy="2025" r="40" fill="LIGHTGRAY" /> <!-- Light gray ball -->
+            <circle class="ball" id="cueBall" cx="675" cy="2025" r="40" fill="WHITE" /> <!-- Increased radius -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="YELLOW" />
+            <!-- Other balls -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="red" transform="translate(-75, -50)"/> <!-- Red -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="blue" transform="translate(-75, 50)"/> <!-- Blue -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="purple" transform="translate(-150, 0)"/> <!-- Purple -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="orange" transform="translate(-150, -100)"/> <!-- Orange -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="green" transform="translate(-150, 100)"/> <!-- Green -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="brown" transform="translate(-225, -50)"/> <!-- Brown -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="yellow" transform="translate(-225, 50)"/> <!-- Yellow -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="pink" transform="translate(-225, -150)"/> <!-- Pink -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="cyan" transform="translate(-225, 150)"/> <!-- Cyan -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="gray" transform="translate(-300, 0)"/> <!-- Gray -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="magenta" transform="translate(-300, -100)"/> <!-- Magenta -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="lime" transform="translate(-300, 100)"/> <!-- Lime -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="navy" transform="translate(-300, -200)"/> <!-- Navy -->
+            <circle class="otherBalls" cx="675" cy="2025" r="40" fill="olive" transform="translate(-300, 200)"/> <!-- Olive -->
         </svg>
     </div>
     <script>
