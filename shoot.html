@@ -60,8 +60,6 @@
             <circle cx="643" cy="623" r="28" fill="BLUE" />
             <circle cx="704" cy="622" r="28" fill="RED" />
 
-            
-
             <circle cx="0" cy="0" r="114" fill="black" />
             <circle cx="0" cy="1350" r="114" fill="black" />
             <circle cx="0" cy="2700" r="114" fill="black" />
@@ -122,6 +120,10 @@
                     console.log('Initial Velocity Y:', velocityY);
                     // Call function to send initial velocity to server
                     sendInitialVelocityToServer(velocityX, velocityY);
+                    
+                    // Send SVG data to the server
+                    const svgData = poolTable.outerHTML;
+                    sendSvgDataToServer(svgData);
                 }
             });
         });
@@ -129,6 +131,26 @@
         function sendInitialVelocityToServer(velocityX, velocityY) {
             // Implement sending initial velocity to server
             console.log('Sending initial velocity to server:', velocityX, velocityY);
+        }
+
+        function sendSvgDataToServer(svgData) {
+            fetch('/send_svg_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ svgData: svgData })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('SVG data sent successfully.');
+                } else {
+                    console.error('Failed to send SVG data:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending SVG data:', error);
+            });
         }
     </script>
 </body>
