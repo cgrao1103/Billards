@@ -60,21 +60,21 @@
             <circle cx="643" cy="623" r="28" fill="BLUE" />
             <circle cx="704" cy="622" r="28" fill="RED" />
             
-            <circle cx="672" cy="573" r="28" fill="ORANGE"/>
-            <circle cx="730" cy="573" r="28" fill="GREEN" />
-            <circle cx="613" cy="573" r="28" fill="PURPLE" />
+            <circle cx="672" cy="573" r="28" fill="PURPLE"/>
+            <circle cx="730" cy="573" r="28" fill="ORANGE" />
+            <circle cx="613" cy="573" r="28" fill="GREEN" />
 
-            <circle cx="640" cy="523" r="28" fill="BLACK" />
-            <circle cx="701" cy="523" r="28" fill="YELLOW" />
-            <circle cx="762" cy="523" r="28" fill="MAROON" />
-            <circle cx="582" cy="523" r="28" fill="RED" />
+            <circle cx="640" cy="523" r="28" fill="BROWN" />
+            <circle cx="701" cy="523" r="28" fill="BLACK" />
+            <circle cx="762" cy="523" r="28" fill="LIGHTYELLOW" />
+            <circle cx="582" cy="523" r="28" fill="LIGHTBLUE" />
             
-            <circle cx="668" cy="472" r="28" fill="ORANGE"/>
-            <circle cx="730" cy="472" r="28" fill="GREEN" />
-            <circle cx="610" cy="472" r="28" fill="MAROON" />
+            <circle cx="668" cy="472" r="28" fill="PINK"/>
+            <circle cx="730" cy="472" r="28" fill="MEDIUMPURPLE" />
+            <circle cx="610" cy="472" r="28" fill="LIGHTSALMON" />
 
-            <circle cx="552" cy="472" r="28" fill="BLUE" />
-            <circle cx="788" cy="472" r="28" fill="PURPLE" />
+            <circle cx="552" cy="472" r="28" fill="LIGHTGREEN" />
+            <circle cx="788" cy="472" r="28" fill="SANDYBROWN" />
 
             
 
@@ -84,6 +84,26 @@
             <circle cx="1350" cy="0" r="114" fill="black" />
             <circle cx="1350" cy="1350" r="114" fill="black" />
             <circle cx="1350" cy="2700" r="114" fill="black" />
+            BALL_COLOURS = [
+    "WHITE",
+    "YELLOW",
+    "BLUE",
+    "RED",
+    "PURPLE",
+    "ORANGE",
+    "GREEN",
+    "BROWN",
+    "BLACK",
+    "LIGHTYELLOW",
+    "LIGHTBLUE",
+    "PINK",
+    "MEDIUMPURPLE",
+    "LIGHTSALMON",
+    "LIGHTGREEN",
+    "SANDYBROWN"
+]
+
+        
         </svg>
     </div>
     <script>
@@ -93,7 +113,7 @@
             let isDragging = false;
             let guideLine = null;
             let initialX, initialY;
-
+    
             cueBall.addEventListener('mousedown', function(event) {
                 isDragging = true;
                 initialX = event.clientX;
@@ -111,7 +131,7 @@
                 guideLine.setAttribute('x2', cueBall.getAttribute('cx'));
                 guideLine.setAttribute('y2', cueBall.getAttribute('cy'));
             });
-
+    
             document.addEventListener('mousemove', function(event) {
                 if (isDragging) {
                     const cueBallRect = cueBall.getBoundingClientRect();
@@ -121,7 +141,7 @@
                     guideLine.setAttribute('y2', mouseY);
                 }
             });
-
+    
             document.addEventListener('mouseup', function(event) {
                 if (isDragging) {
                     isDragging = false;
@@ -136,14 +156,14 @@
                     const velocityY = releasePositionY - cueBallCenterY;
                     console.log('Initial Velocity X:', velocityX);
                     console.log('Initial Velocity Y:', velocityY);
-
+    
                     // Create JSON object
                     const data = {
                         svg: poolTable.outerHTML,
-                        velocityX: velocityX,
+                        velocityX: velocityX, // Include velocityX parameter
                         velocityY: velocityY
                     };
-
+    
                     // Send JSON object to server
                     fetch('/send_data', {
                         method: 'POST',
@@ -164,5 +184,6 @@
             });
         });
     </script>
+    
 </body>
 </html>

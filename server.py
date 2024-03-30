@@ -1,6 +1,5 @@
 import sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import urllib.parse
 import json
 import xml.etree.ElementTree as ET
 import Physics
@@ -25,40 +24,51 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b"404 Not Found")
-
+            
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        parsed_post_data = urllib.parse.parse_qs(post_data.decode('utf-8'))
+        post_data = self.rfile.read(content_length).decode('utf-8')
+        parsed_post_data = json.loads(post_data)
         
         # Process the velocity data if it's being sent
-        if self.path == '/send_velocity':
-            velocity_x = float(parsed_post_data['velocityX'][0])
-            velocity_y = float(parsed_post_data['velocityY'][0])
-            self.process_velocity(velocity_x, velocity_y)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.send_header('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
-            self.end_headers()
-            self.wfile.write(b"Initial velocity received and processed successfully.")
-            
-            svg_data = parsed_post_data.get('svg', '')    
-            root = ET.fromstring(svg_data)
-            table = []  # Assuming this is a list to store the table balls
-            for child in root:
-                if child.tag.endswith('circle'):
-                    cx = child.attrib.get('cx', '')
-                    cy = child.attrib.get('cy', '')
-                    r = child.attrib.get('r', '')
-                    fill = child.attrib.get('fill', '')
-                    if r < 30:
-                        ball_number = Physics.BALL_COLOURS.index(fill)
-                        table.append(Physics.StillBall(ball_number, Physics.Coordinate(cx, cy)))
-            
-            game = Physics.Game(None, "Pool", "Kit", "Kat")
-            game.shoot(table, "Pool", "Kit", velocity_x, velocity_y)
-        
+        if self.path == '/send_data':
+            velocity_x = parsed_post_data.get('velocityX')
+            velocity_y = parsed_post_data.get('velocityY')
+            if velocity_x is not None and velocity_y is not None:
+                self.process_velocity(velocity_x, velocity_y)
+                self.send_response(200)
+                self.send_header('Content-type', 'text/plain')
+                self.send_header('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
+                self.end_headers()
+                self.wfile.write(b"Initial velocity received and processed successfully.")
+                
+                svg_data = parsed_post_data.get('svg', '')    
+                try:
+                    velocity_x = float(velocity_x)
+                    velocity_y = float(velocity_y)
+                    root = ET.fromstring(svg_data)
+                    table = Physics.Table()  # Assuming this is a list to store the table balls
+                    for child in root:
+                        if child.tag.endswith('circle'):
+                            cx = float(child.attrib.get('cx', 0))
+                            cy = float(child.attrib.get('cy', 0))
+                            r = float(child.attrib.get('r', 0))
+                            fill = child.attrib.get('fill', '')
+                            if r < 30:
+                                if fill == 'WHITE':
+                                    table += (Physics.StillBall(0,Physics.Coordinate(cx,cy)))
+                                else:    
+                                    ball_number = Physics.BALL_COLOURS.index(fill)
+                                    table += (Physics.StillBall(ball_number, Physics.Coordinate(cx, cy)))
+                
+                    game = Physics.Game(None, "Pool", "Kit", "Kat")
+                    game.shoot("Pool", "Kit",table, velocity_x, velocity_y)
                     
+                except ET.ParseError as e:
+                    print(f"Error parsing SVG data: {e}")
+                    self.send_error(400, "Bad Request: Invalid SVG data")
+            else:
+                self.send_error(400, "Bad Request: Missing velocity data")
         else:
             self.send_response(404)
             self.end_headers()
