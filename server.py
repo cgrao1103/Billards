@@ -18,6 +18,9 @@ class MyHandler(BaseHTTPRequestHandler):
             self._serve_svg_file(parsed_path)
         elif parsed_path.endswith(".svg"):
             self._serve_static_file(parsed_path, 'image/svg+xml')
+        elif parsed_path == "/favicon.ico":  # Handle favicon request
+            self.send_response(204)
+            self.end_headers()
         else:
             self.send_response(404)
             self.end_headers()
@@ -52,8 +55,9 @@ class MyHandler(BaseHTTPRequestHandler):
                         ball_number = Physics.BALL_COLOURS.index(fill)
                         table.append(Physics.StillBall(ball_number, Physics.Coordinate(cx, cy)))
             
-            game = Physics.Game()
-            game.shoot(table, velocity_x, velocity_y)
+            game = Physics.Game(None, "Pool", "Kit", "Kat")
+            game.shoot(table, "Pool", "Kit", velocity_x, velocity_y)
+        
                     
         else:
             self.send_response(404)
@@ -107,6 +111,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
 def run_server(port):
     httpd = HTTPServer(('localhost', port), MyHandler)
+    
     print("Server listening on port:", port)
     httpd.serve_forever()
 
