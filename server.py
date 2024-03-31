@@ -44,8 +44,8 @@ class MyHandler(BaseHTTPRequestHandler):
                 
                 svg_data = parsed_post_data.get('svg', '')    
                 try:
-                    velocity_x = float(velocity_x)
-                    velocity_y = float(velocity_y)
+                    velocity_x = (float(velocity_x)) *10
+                    velocity_y = (float(velocity_y))*10
                     root = ET.fromstring(svg_data)
                     table = Physics.Table()  # Assuming this is a list to store the table balls
                     for child in root:
