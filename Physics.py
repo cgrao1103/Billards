@@ -1,6 +1,6 @@
 import phylib
 import sqlite3
-
+import os
 import math
 
 # Define the header and footer for SVG files
@@ -372,9 +372,10 @@ class Table(phylib.phylib_table):
 class Database:
     def __init__(self, reset=False):
         if reset:
-            import os
-            if os.path.exists("phylib.db"):
+            try:
                 os.remove("phylib.db")
+            except FileNotFoundError:
+                    pass
 
         self.conn = sqlite3.connect("phylib.db")
         
@@ -542,13 +543,13 @@ class Database:
 
         # Query the database to retrieve the player ID
         cursor.execute('''SELECT PLAYERID FROM Player WHERE PLAYERNAME = ?''', (playerName,))
-        PLAYERID = cursor.fetchone()
+        playerID = cursor.fetchone()
 
         # Close the connection
         conn.close()
 
         # Return the player ID if found, otherwise return None
-        return PLAYERID[0] if PLAYERID else None
+        return playerID[0] if playerID else None
     
     def getGameID(self, gameName):
     
@@ -611,6 +612,28 @@ class Database:
         # Commit the transaction and close the connection
         conn.commit()
         conn.close()
+        
+    def getGame(self, game_id):
+        cursor = self.conn.cursor()
+        
+        cursor.execute("""
+            SELECT G.GAMEID, G.GAMENAME, P1.PLAYERNAME AS PLAYER1NAME, P2.PLAYERNAME AS PLAYER2NAME
+            FROM Game G
+            JOIN Player P1 ON G.PLAYERID = P1.PLAYERID
+            JOIN Player P2 ON G.PLAYERID = P2.PLAYERID
+            WHERE G.GAMEID = ?
+        """, (game_id,))
+        game_info = cursor.fetchone()
+        cursor.close()
+        if game_info:
+            return {
+                'game_id': game_info[0],
+                'game_name': game_info[1],
+                'player1_name': game_info[2],
+                'player2_name': game_info[3]
+            }
+        else:
+            raise ValueError(f"No game found with gameID {game_id}.")
     
     
     
@@ -620,11 +643,9 @@ class Database:
 class Game:
     
     def __init__(self, gameID=None, gameName=None, player1Name=None, player2Name=None):
-       
         self.database = Database()
-        
         self.database.createDB()
-        
+
         if gameID is not None and (gameName is not None or player1Name is not None or player2Name is not None):
             raise TypeError("If gameID is provided, other arguments must be None")
         elif gameID is None and (gameName is None or player1Name is None or player2Name is None):
@@ -646,8 +667,6 @@ class Game:
             self.database.setGame(gameName, player1Name, player2Name)
 
     
-    
-    
     def shoot(self,gameName, playerName, table, xvel, yvel):
         gameID = self.database.getGameID(self.gameName)
         
@@ -655,11 +674,8 @@ class Game:
         if gameID is None:
             raise ValueError("Invalid gameName")
 
-        playerID = self.database.getPlayerID(playerName)
-        if playerID is None:
-            raise ValueError("Invalid playerName")
 
-        shotID = self.database.newShot(gameID, playerID)
+        shotID = self.database.newShot(gameName, playerName)
         if shotID is None:
             return
 

@@ -4,95 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Make a Shot</title>
-    
 </head>
 <body>
-    <div id="poolTableContainer">
-        <svg id="poolTable" viewBox="0 0 1378 2723" xmlns="http://www.w3.org/2000/svg">
-            <style>
-                body {
-                    background-color: #282c34;
-                    color: white;
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 0;
-                }
-        
-                #poolTableContainer {
-                    width: 80%;
-                    max-width: 700px;
-                    margin: 0 auto;
-                    border: 2px solid black;
-                    position: relative;
-                    overflow: hidden;
-                    border-radius: 10px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-                    display: flex; /* Center the content horizontally */
-                    justify-content: center; /* Center the content horizontally */
-                }
-        
-                #poolTable {
-                    width: 100%;
-                    height: 100%;
-                    background-color: green;
-                }
-        
-                .ball {
-                    fill: white;
-                    cursor: pointer;
-                }
-        
-                #cueBall {
-                    r: 28; /* Increased radius */
-                }
-        
-                #guideLine {
-                    stroke: white;
-                    stroke-width: 6; /* Increased stroke width */
-                }
-            </style>
+    <div id="gameContainer">
+        <h1>8-Ball Pool Game</h1>
+        <div id="playerNames">
+            <label for="player1Name">Player 1 Name:</label>
+            <input type="text" id="player1Name" required><br>
+            <label for="player2Name">Player 2 Name:</label>
+            <input type="text" id="player2Name" required><br>
+            <button id="startGameBtn">Start Game</button>
+            <div id="turn"></div>
+        </div>
+        <div id="poolContainer">
+            <div id="poolCSS">
+                <style>
+                    body {
+                        background-color: #282c34;
+                        color: white;
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                    }
 
-            <rect width="1350" height="2750" x="0" y="0" fill="#C0D0C0" />
-            <rect width="1350" height="25" x="-25" y="0" fill="darkgreen" />
-            <rect width="1350" height="25" x="-25" y="2700" fill="darkgreen" />
-            <rect width="25" height="2750" x="0" y="-25" fill="darkgreen" />
-            <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
-            <circle class="ball" id="cueBall" cx="675" cy="2025" r="28" fill="WHITE" /> 
-            <circle cx="675" cy="675" r="28" fill="YELLOW" />
-            <circle cx="643" cy="623" r="28" fill="BLUE" />
-            <circle cx="704" cy="622" r="28" fill="RED" />
-          
-            <circle cx="672" cy="573" r="28" fill="PURPLE"/>
-            <circle cx="730" cy="573" r="28" fill="ORANGE" />
-            <circle cx="613" cy="573" r="28" fill="GREEN" />
+                    #gameContainer {
+                        text-align: center;
+                        margin-top: 50px;
+                    }
 
-            <circle cx="640" cy="523" r="28" fill="BROWN" />
-            <circle cx="701" cy="523" r="28" fill="BLACK" />
-            <circle cx="762" cy="523" r="28" fill="LIGHTYELLOW" />
-            <circle cx="582" cy="523" r="28" fill="LIGHTBLUE" />
-            
-            <circle cx="668" cy="472" r="28" fill="PINK"/>
-            <circle cx="730" cy="472" r="28" fill="MEDIUMPURPLE" />
-            <circle cx="610" cy="472" r="28" fill="LIGHTSALMON" />
+                    #playerNames {
+                        background-color: rgba(0, 0, 0, 0.5);
+                        padding: 20px;
+                        border-radius: 10px;
+                        display: inline-block;
+                    }
 
-            <circle cx="552" cy="472" r="28" fill="LIGHTGREEN" />
-            <circle cx="788" cy="472" r="28" fill="SANDYBROWN" />
-            
-            
-         
+                    #playerNames label {
+                        display: block;
+                        margin-bottom: 10px;
+                    }
 
-            
+                    #playerNames input {
+                        width: 200px;
+                        padding: 5px;
+                        margin-bottom: 10px;
+                        border-radius: 5px;
+                        border: none;
+                    }
 
-            <circle cx="0" cy="0" r="114" fill="black" />
-            <circle cx="0" cy="1350" r="114" fill="black" />
-            <circle cx="0" cy="2700" r="114" fill="black" />
-            <circle cx="1350" cy="0" r="114" fill="black" />
-            <circle cx="1350" cy="1350" r="114" fill="black" />
-            <circle cx="1350" cy="2700" r="114" fill="black" />
-            
+                    #startGameBtn {
+                        background-color: #4caf50;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        text-align: center;
+                        text-decoration: none;
+                        display: inline-block;
+                        font-size: 16px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    }
 
-        
-        </svg>
+                    #startGameBtn:hover {
+                        background-color: #45a049;
+                    }
+
+                    #turn {
+                        margin-top: 20px;
+                        font-size: 20px;
+                    }
+
+                    #poolContainer {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+
+                    #poolTableContainer {
+                        width: 80%;
+                        max-width: 700px;
+                        margin: 0 auto;
+                        border: 2px solid black;
+                        position: relative;
+                        overflow: hidden;
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                        display: flex; /* Center the content horizontally */
+                        justify-content: center; /* Center the content horizontally */
+                    }
+
+                    #poolTable {
+                        width: 100%;
+                        height: 100%;
+                        background-color: green;
+                    }
+
+                    .ball {
+                        fill: white;
+                        cursor: pointer;
+                    }
+
+                    #cueBall {
+                        r: 28; /* Increased radius */
+                    }
+
+                    #guideLine {
+                        stroke: white;
+                        stroke-width: 6; /* Increased stroke width */
+                    }
+                </style>
+            </div>
+            <div id="poolTableContainer">
+                <svg id="poolTable" viewBox="-25 -25 1400 2750" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="1350" height="2750" x="0" y="0" fill="#C0D0C0" />
+                    <rect width="1350" height="25" x="-25" y="0" fill="darkgreen" />
+                    <rect width="1350" height="25" x="-25" y="2700" fill="darkgreen" />
+                    <rect width="25" height="2750" x="0" y="-25" fill="darkgreen" />
+                    <rect width="25" height="2750" x="1350" y="-25" fill="darkgreen" />
+                    <circle class="ball" id="cueBall" cx="675" cy="2025" r="28" fill="WHITE" /> 
+                    <circle cx="675" cy="675" r="28" fill="YELLOW" />
+                    <circle cx="643" cy="623" r="28" fill="BLUE" />
+                    <circle cx="704" cy="622" r="28" fill="RED" />
+                  
+                    <circle cx="672" cy="573" r="28" fill="PURPLE"/>
+                    <circle cx="730" cy="573" r="28" fill="ORANGE" />
+                    <circle cx="613" cy="573" r="28" fill="GREEN" />
+
+                    <circle cx="640" cy="523" r="28" fill="BROWN" />
+                    <circle cx="701" cy="523" r="28" fill="BLACK" />
+                    <circle cx="762" cy="523" r="28" fill="LIGHTYELLOW" />
+                    <circle cx="582" cy="523" r="28" fill="LIGHTBLUE" />
+                    
+                    <circle cx="668" cy="472" r="28" fill="PINK"/>
+                    <circle cx="730" cy="472" r="28" fill="MEDIUMPURPLE" />
+                    <circle cx="610" cy="472" r="28" fill="LIGHTSALMON" />
+
+                    <circle cx="552" cy="472" r="28" fill="LIGHTGREEN" />
+                    <circle cx="788" cy="472" r="28" fill="SANDYBROWN" />
+                    
+                    
+                    <circle cx="0" cy="0" r="114" fill="black" />
+                    <circle cx="0" cy="1350" r="114" fill="black" />
+                    <circle cx="0" cy="2700" r="114" fill="black" />
+                    <circle cx="1350" cy="0" r="114" fill="black" />
+                    <circle cx="1350" cy="1350" r="114" fill="black" />
+                    <circle cx="1350" cy="2700" r="114" fill="black" />
+                </svg>
+            </div>
+        </div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -104,43 +163,69 @@
             const parser = new DOMParser();
 
             function fetchSVGData() {
-                const xhr = new XMLHttpRequest();
-                /*xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            // Update the SVG container with the received SVG data
-                            poolTable.innerHTML = xhr.responseText;
-                        } else {
-                            console.error('Failed to fetch SVG data:', xhr.status);
-                        }
-                    }
-                }; */
-                
-                xhr.open('GET', '/fetch_svg');
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/fetch_svg');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
                 if (xhr.status === 200) {
                     var svg_info = JSON.parse(xhr.responseText);
                     for (var i = 0; i < svg_info.length; i++) {
-                        var data = svg_info[i];
-                        docs = parser.parseFromString(data, 'image/svg+xml');
-                        var svg_e = docs.documentElement;
-                        poolTable.innerHTML='';
-                        poolTable.appendChild(svg_e);
+                        (function(index) { // Closure to preserve the value of i
+                            setTimeout(function() {
+                                var data = svg_info[index];
+                                docs = parser.parseFromString(data, 'image/svg+xml');
+                                var svg_e = docs.documentElement;
+                                
+                                // Set new dimensions for the SVG
+                                svg_e.setAttribute('width', '700'); // Set width to 700px
+                                svg_e.setAttribute('height', '1000'); // Set height to 1000px
+                                
+                                // Update viewBox attribute based on new dimensions
+                                var originalViewBox = svg_e.getAttribute('viewBox').split(' ');
+                                var originalWidth = parseFloat(originalViewBox[2]);
+                                var originalHeight = parseFloat(originalViewBox[3]);
+                                var aspectRatio = originalWidth / originalHeight;
+                                var newWidth = 700;
+                                var newHeight = newWidth / aspectRatio;
+                                var viewBoxValue = [originalViewBox[0], originalViewBox[1], newWidth, newHeight].join(' ');
+                                svg_e.setAttribute('viewBox', viewBoxValue);
+                                
+                                poolTable.appendChild(svg_e);
+                            }, index * 10); // Add a latency of 10 seconds for each element
+                        })(i);
                     } 
                 }
                 else {
                     console.error('Error receiving SVG information');
                 }
-        };
-                xhr.send();
+            };
+            xhr.send();
+        }
+
+
+
+            function resetGameState() {
+                // Fetch SVG data to update the game state
+                fetchSVGData();
+                // Re-enable game interactions
+                enableGameInteractions();
             }
 
-            // Fetch SVG data when the page loads
-            
+            function enableGameInteractions() {
+                // Add event listeners for game interactions
+                cueBall.addEventListener('mousedown', startDragging);
+                document.addEventListener('mousemove', dragCueBall);
+                document.addEventListener('mouseup', releaseCueBall);
+            }
 
-    
-            cueBall.addEventListener('mousedown', function(event) {
+            function disableGameInteractions() {
+                // Remove event listeners for game interactions
+                cueBall.removeEventListener('mousedown', startDragging);
+                document.removeEventListener('mousemove', dragCueBall);
+                document.removeEventListener('mouseup', releaseCueBall);
+            }
+
+            function startDragging(event) {
                 isDragging = true;
                 initialX = event.clientX;
                 initialY = event.clientY;
@@ -156,9 +241,9 @@
                 guideLine.setAttribute('y1', cueBall.getAttribute('cy'));
                 guideLine.setAttribute('x2', cueBall.getAttribute('cx'));
                 guideLine.setAttribute('y2', cueBall.getAttribute('cy'));
-            });
-    
-            document.addEventListener('mousemove', function(event) {
+            }
+
+            function dragCueBall(event) {
                 if (isDragging) {
                     const cueBallRect = cueBall.getBoundingClientRect();
                     const mouseX = event.clientX - initialX + parseFloat(cueBall.getAttribute('cx'));
@@ -166,9 +251,9 @@
                     guideLine.setAttribute('x2', mouseX);
                     guideLine.setAttribute('y2', mouseY);
                 }
-            });
-    
-            document.addEventListener('mouseup', function(event) {
+            }
+
+            function releaseCueBall(event) {
                 if (isDragging) {
                     isDragging = false;
                     poolTable.removeChild(guideLine);
@@ -182,14 +267,22 @@
                     const velocityY = releasePositionY - cueBallCenterY;
                     console.log('Initial Velocity X:', velocityX);
                     console.log('Initial Velocity Y:', velocityY);
-    
-                    // Create JSON object
+
+                    // Get player names
+                    var player1Name = document.getElementById('player1Name').value.trim();
+                    var player2Name = document.getElementById('player2Name').value.trim();
+
+                    // Create JSON object with player names
                     const data = {
                         svg: poolTable.outerHTML,
-                        velocityX: velocityX, // Include velocityX parameter
-                        velocityY: velocityY
+                        velocityX: velocityX,
+                        velocityY: velocityY,
+                        playerNames: {
+                            player1Name: player1Name,
+                            player2Name: player2Name
+                        }
                     };
-    
+
                     // Send JSON object to server
                     fetch('/send_data', {
                         method: 'POST',
@@ -201,6 +294,8 @@
                         if (response.ok) {
                             console.log('Data sent successfully.');
                             fetchSVGData();
+                            // Update current turn information
+                            getCurrentTurn();
                         } else {
                             console.error('Failed to send data.');
                         }
@@ -208,13 +303,37 @@
                         console.error('Error occurred while sending data:', error);
                     });
                 }
-            });
+            }
 
-            
-            
-                        
+            function getCurrentTurn() {
+                fetch('/current_turn')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update HTML content with current turn information
+                        document.getElementById('turn').innerText = data.current_turn;
+                    })
+                    .catch(error => console.error('Error fetching current turn:', error));
+            }
+
+            // Call the function to fetch current turn when the page loads
+            window.onload = getCurrentTurn;
+
+            // Add event listener to start the game
+            document.getElementById('startGameBtn').addEventListener('click', function() {
+
+                var player1Name = document.getElementById('player1Name').value.trim();
+                var player2Name = document.getElementById('player2Name').value.trim();
+
+                if (!player1Name || !player2Name) {
+                    alert('Please enter both player names.');
+                    return;
+                }
+                // Reset game state when the game starts
+                resetGameState();
+            });
         });
     </script>
+    
     
 </body>
 </html>
