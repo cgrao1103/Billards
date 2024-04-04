@@ -659,14 +659,21 @@ class Game:
             self.gameName = game_data[1]
             self.player1Name = game_data[2]
             self.player2Name = game_data[3]
+            self.current = player1Name
         else:
             self.gameID = None
             self.gameName = gameName
             self.player1Name = player1Name
             self.player2Name = player2Name
             self.database.setGame(gameName, player1Name, player2Name)
+            self.current = player1Name
 
-    
+    def switch(self):
+        if self.current == self.player1Name:
+            self.current = self.player2Name
+        else:
+            self.current = self.player1Name
+
     def shoot(self,gameName, playerName, table, xvel, yvel):
         gameID = self.database.getGameID(self.gameName)
         

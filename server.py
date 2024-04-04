@@ -84,7 +84,8 @@ class MyHandler(BaseHTTPRequestHandler):
                                     table += (Physics.StillBall(ball_number, Physics.Coordinate(cx, cy)))
                                     
                     game = Physics.Game(gameID=None, gameName="8Ball", player1Name=self.player1_name, player2Name=self.player2_name)
-                    game.shoot("8-Ball", current_turn, table, velocity_x, velocity_y)
+                    game.shoot("8-Ball", game.current, table, velocity_x, velocity_y)
+                    game.switch()
                     
                 except ET.ParseError as e:
                     print(f"Error parsing SVG data: {e}")

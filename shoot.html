@@ -115,7 +115,7 @@
                 </style>
             </div>
             <div id="poolTableContainer">
-                <svg id="poolTable" viewBox="-25 -25 1400 2750" xmlns="http://www.w3.org/2000/svg">
+                <svg id="poolTable" viewBox="0 0 1378 2723" xmlns="http://www.w3.org/2000/svg">
                     <rect width="1350" height="2750" x="0" y="0" fill="#C0D0C0" />
                     <rect width="1350" height="25" x="-25" y="0" fill="darkgreen" />
                     <rect width="1350" height="25" x="-25" y="2700" fill="darkgreen" />
@@ -162,45 +162,50 @@
             let initialX, initialY;
             const parser = new DOMParser();
 
-            function fetchSVGData() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', '/fetch_svg');
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var svg_info = JSON.parse(xhr.responseText);
-                    for (var i = 0; i < svg_info.length; i++) {
-                        (function(index) { // Closure to preserve the value of i
-                            setTimeout(function() {
-                                var data = svg_info[index];
-                                docs = parser.parseFromString(data, 'image/svg+xml');
-                                var svg_e = docs.documentElement;
-                                
-                                // Set new dimensions for the SVG
-                                svg_e.setAttribute('width', '700'); // Set width to 700px
-                                svg_e.setAttribute('height', '1000'); // Set height to 1000px
-                                
-                                // Update viewBox attribute based on new dimensions
-                                var originalViewBox = svg_e.getAttribute('viewBox').split(' ');
-                                var originalWidth = parseFloat(originalViewBox[2]);
-                                var originalHeight = parseFloat(originalViewBox[3]);
-                                var aspectRatio = originalWidth / originalHeight;
-                                var newWidth = 700;
-                                var newHeight = newWidth / aspectRatio;
-                                var viewBoxValue = [originalViewBox[0], originalViewBox[1], newWidth, newHeight].join(' ');
-                                svg_e.setAttribute('viewBox', viewBoxValue);
-                                
-                                poolTable.appendChild(svg_e);
-                            }, index * 10); // Add a latency of 10 seconds for each element
-                        })(i);
-                    } 
-                }
-                else {
-                    console.error('Error receiving SVG information');
-                }
-            };
-            xhr.send();
+          function fetchSVGData() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/fetch_svg');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var svg_info = JSON.parse(xhr.responseText);
+            for (var i = 0; i < svg_info.length; i++) {
+                (function (index) { // Closure to preserve the value of i
+                    setTimeout(function () {
+                        var data = svg_info[index];
+                        docs = parser.parseFromString(data, 'image/svg+xml');
+                        var svg_e = docs.documentElement;
+
+                        // Set new dimensions for the SVG
+                        svg_e.setAttribute('width', '1386.7'); // Set width to 700px
+                        svg_e.setAttribute('height', '2698'); // Set height to 1000px
+
+                        // Update viewBox attribute based on new dimensions
+                        var originalViewBox = [-25, -25, 1400, 2750];
+                        var newWidth = 1500; // Replace with your new width value
+                        var newHeight = 3000; // Replace with your new height value
+
+                        var viewBoxValue = [originalViewBox[0], originalViewBox[1], newWidth, newHeight].join(' ');
+                        svg_e.setAttribute('viewBox', viewBoxValue); // Set viewBox attribute
+                        console.log(viewBoxValue); // Output: "-25 -25 1500 3000"
+
+                        // Append the updated SVG to the poolTable container
+                        poolTable.innerHTML = ''; // Clear previous SVGs
+                        poolTable.appendChild(svg_e);
+
+                        // Attach event listeners to the last updated SVG element
+                        if (index === svg_info.length - 1) {
+                            enableGameInteractions(svg_e);
+                        }
+                    }, index * 10); // Add a latency of 10 seconds for each element
+                })(i);
+            }
+        } else {
+            console.error('Error receiving SVG information');
         }
+    };
+    xhr.send();
+}
 
 
 
@@ -332,6 +337,7 @@
                 resetGameState();
             });
         });
+       
     </script>
     
     
