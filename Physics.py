@@ -3,6 +3,8 @@ import sqlite3
 import os
 import math
 
+
+
 # Define the header and footer for SVG files
 HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -368,20 +370,20 @@ class Table(phylib.phylib_table):
 
     
 """A3"""  
-
 class Database:
     def __init__(self, reset=False):
         if reset:
             try:
                 os.remove("phylib.db")
+                print("phylib.db file deleted successfully.")
             except FileNotFoundError:
-                    pass
+                print("phylib.db file not found.")
+                pass
 
         self.conn = sqlite3.connect("phylib.db")
         
         self.cursor = self.conn.cursor()
-        self.cursor.fetchall()
-        self.createDB()
+        self.createDB() # E
 
     def createDB(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS Ball (
@@ -734,5 +736,5 @@ class Game:
                 #self.database.conn.commit()
             table = newtable
             
-
+database = Database(reset=True)
         

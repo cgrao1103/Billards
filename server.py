@@ -86,6 +86,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     game = Physics.Game(gameID=None, gameName="8Ball", player1Name=self.player1_name, player2Name=self.player2_name)
                     game.shoot("8-Ball", game.current, table, velocity_x, velocity_y)
                     game.switch()
+                    self.switch_turns()
                     
                 except ET.ParseError as e:
                     print(f"Error parsing SVG data: {e}")
@@ -150,6 +151,13 @@ class MyHandler(BaseHTTPRequestHandler):
         except Exception as e:
             print(f"Error generating SVG data: {e}")
             self.send_error(500, "Internal Server Error")
+            
+    def switch_turns(self):
+        global current_turn
+        if current_turn == 'Player 1':
+            current_turn = 'Player 2'
+        else:
+            current_turn = 'Player 1'
 
 def run_server(port):
     httpd = HTTPServer(('localhost', port), MyHandler)
